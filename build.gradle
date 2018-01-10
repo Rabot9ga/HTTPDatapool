@@ -43,8 +43,8 @@ springBoot {
 	executable = true
 	embeddedLaunchScriptProperties =
 			[mode: 'service',
-			 pidFolder: 'pid2/',
-			 logFolder: 'log2/'
+			 pidFolder: 'pid/',
+			 logFolder: 'log/'
 			]
 
 }
@@ -52,11 +52,10 @@ springBoot {
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
-//	compile('org.springframework.boot:spring-boot-actuator-docs')
-	compile('org.springframework.boot:spring-boot-starter-jdbc')
+//	compile('org.springframework.boot:spring-boot-starter-jdbc')
 	compile('org.springframework.boot:spring-boot-starter-web')
 	runtime('org.springframework.boot:spring-boot-devtools')
-	runtime('org.postgresql:postgresql')
+//	runtime('org.postgresql:postgresql')
 	compileOnly('org.projectlombok:lombok')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
