@@ -9,6 +9,7 @@ package ru.sbt.util.HTTPDatapool.paramsContainer.dto;
 public enum RequestType {
     SEQUENTIAL,
     RANDOM,
-    UNIQUE
+    UNIQUE_SEQUENTIAL,
+    UNIQUE_RANDOM
 }
 
