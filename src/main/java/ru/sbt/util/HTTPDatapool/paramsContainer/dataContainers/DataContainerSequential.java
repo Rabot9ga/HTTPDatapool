@@ -6,18 +6,30 @@ import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class DataContainerRandom extends AbstractDataContainer implements DataContainerAPI{
+
+public class DataContainerSequential extends AbstractDataContainer implements DataContainerAPI {
+
     private List<Map<String, String>> list = new ArrayList<>();
 
-    public DataContainerRandom() {
-        super.requestType = RequestType.RANDOM;
+    private AtomicInteger counter = new AtomicInteger();
+
+    public DataContainerSequential() {
+        counter.set(0);
+        super.requestType = RequestType.SEQUENTIAL;
     }
 
     @Override
-    public Map<String, String> getRow() {
-        return list.get(ThreadLocalRandom.current().nextInt(list.size()));
+    public synchronized Map<String, String> getRow() {
+
+        // FIXME: 11.01.2018 IT SEEMS TO BE SHITTY
+//        synchronized (this){
+            if (counter.get() + 1 == list.size())
+                counter.set(0);
+//        }
+        return list.get(counter.getAndIncrement());
+//        throw new UnsupportedOperationException("Not supported yet");
     }
 
     @Override
@@ -26,12 +38,12 @@ public class DataContainerRandom extends AbstractDataContainer implements DataCo
     }
 
     @Override
-    public <T extends List> void addTable(T collection) {
+    public <T extends List> T getTable() {
         throw new UnsupportedOperationException("Not supported yet");
     }
 
     @Override
-    public <T extends List> T getTable() {
+    public <T extends List> void addTable(T collection) {
         throw new UnsupportedOperationException("Not supported yet");
     }
 

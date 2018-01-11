@@ -1,15 +1,23 @@
 package ru.sbt.util.HTTPDatapool.paramsContainer.dataContainers;
 
-import ru.sbt.util.HTTPDatapool.paramsContainer.api.ParamsContainerAPI;
+import ru.sbt.util.HTTPDatapool.paramsContainer.api.DataContainerAPI;
+import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
 
+import java.lang.instrument.IllegalClassFormatException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
-public class DataContainerUnique implements ParamsContainerAPI {
+public class DataContainerUnique extends AbstractDataContainer implements DataContainerAPI {
 
     ConcurrentLinkedQueue queue = new ConcurrentLinkedQueue<Map<String, String>>();
+
+    public DataContainerUnique(RequestType type) {
+        if (!(type.equals(RequestType.UNIQUE_RANDOM) || type.equals(RequestType.UNIQUE_SEQUENTIAL)))
+            throw new RuntimeException("Wrong RequestType format!", new IllegalClassFormatException("Creating Unique Data Container you must choose between UNIQUE_RANDOM and UNIQUE_SEQUENTIAL"));
+        super.requestType = type;
+    }
 
     @Override
     public Map<String, String> getRow() {
@@ -34,6 +42,11 @@ public class DataContainerUnique implements ParamsContainerAPI {
     @Override
     public int getSize() {
         return queue.size();
+    }
+
+    @Override
+    public RequestType getRequestType() {
+        return super.requestType;
     }
 
 }
