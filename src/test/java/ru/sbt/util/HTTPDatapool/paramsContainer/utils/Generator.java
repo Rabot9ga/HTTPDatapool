@@ -1,7 +1,9 @@
 package ru.sbt.util.HTTPDatapool.paramsContainer.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.sbt.util.HTTPDatapool.paramsContainer.ParamsContainer;
+import ru.sbt.util.HTTPDatapool.paramsContainer.DataContainerFactory;
+import ru.sbt.util.HTTPDatapool.paramsContainer.api.DataContainerAPI;
+import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
 
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
@@ -9,14 +11,23 @@ import java.util.concurrent.ThreadLocalRandom;
 @Slf4j
 public class Generator {
 
-    static public ParamsContainer fillParamsContainerRandom(int size) {
-        return fillParamsContainer(ParamsContainer.createRandom(), size);
-    }
-    static public ParamsContainer fillParamsContainerSequential(int size) {
-        return fillParamsContainer(ParamsContainer.createSequential(), size);
+    static public DataContainerAPI fillDataContainerRandom(int size) {
+        return fillParamsContainer(DataContainerFactory.createRandom(), size);
     }
 
-    static private ParamsContainer fillParamsContainer(ParamsContainer container, int size) {
+    static public DataContainerAPI fillDataContainerSequential(int size) {
+        return fillParamsContainer(DataContainerFactory.createSequential(), size);
+    }
+
+    static public DataContainerAPI fillDataContainerUniqueRandom(int size) {
+        return fillParamsContainer(DataContainerFactory.createUnique(RequestType.UNIQUE_RANDOM), size);
+    }
+
+    static public DataContainerAPI fillDataContainerUniqueSequential(int size) {
+        return fillParamsContainer(DataContainerFactory.createUnique(RequestType.UNIQUE_SEQUENTIAL), size);
+    }
+
+    static private DataContainerAPI fillParamsContainer(DataContainerAPI container, int size) {
 
         if (size <= 0) throw new NumberFormatException("Size must be positive!");
 

@@ -1,9 +1,13 @@
 package ru.sbt.util.HTTPDatapool.paramsContainer.api;
 
+import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
+
 import java.util.List;
 import java.util.Map;
 
-public interface ParamsContainerAPI {
+public interface DataContainerAPI {
+
+    RequestType requestType = null;
 
     /**
      * getting required data from pool using specified RequestType
@@ -23,5 +27,7 @@ public interface ParamsContainerAPI {
     <T extends List> T getTable();
 
     int getSize();
+
+    RequestType getRequestType();
 
 }
