@@ -35,6 +35,9 @@ repositories {
 		url "http://sbtnexus.ca.sbrf.ru:8081/nexus/content/repositories/central/"
 	}
 	maven {
+		url "http://sbtnexus.ca.sbrf.ru:8081/nexus/content/repositories/AC_COM_thirdparty/"
+	}
+	maven {
 		url "http://sbtnexus.ca.sbrf.ru:8081/nexus/content/repositories/jcenter/"
 	}
 }
@@ -52,10 +55,12 @@ springBoot {
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
-//	compile('org.springframework.boot:spring-boot-starter-jdbc')
+	compile('org.springframework.boot:spring-boot-starter-jdbc')
 	compile('org.springframework.boot:spring-boot-starter-web')
+	compile ('com.oracle.jdbc:ojdbc7:12.1.0.2')
 	runtime('org.springframework.boot:spring-boot-devtools')
 //	runtime('org.postgresql:postgresql')
+
 	compileOnly('org.projectlombok:lombok')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
