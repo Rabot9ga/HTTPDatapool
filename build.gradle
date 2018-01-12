@@ -58,11 +58,11 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-jdbc')
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile ('com.oracle.jdbc:ojdbc7:12.1.0.2')
+	compile ('org.apache.commons:commons-lang3:3.6')
 	runtime('org.springframework.boot:spring-boot-devtools')
 //	runtime('org.postgresql:postgresql')
 
 	compileOnly('org.projectlombok:lombok')
 	testCompileOnly('org.projectlombok:lombok')
-
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
