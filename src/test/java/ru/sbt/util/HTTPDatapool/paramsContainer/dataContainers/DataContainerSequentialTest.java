@@ -17,19 +17,23 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @Slf4j
-public class DataContainerSequentialTest extends TestData{
+public class DataContainerSequentialTest extends TestData {
 
     @Test
-    public void getRow() throws Exception {
+    public void getRowFunctionalTest() throws Exception {
         TestResult testResult = TestUtils.gettingTest(paramsContainerSequential, containerSize);
-//        for (int i = 0; i < 30; i++) {
-//            log.debug(paramsContainerSequential.getRow().get("id"));
-//        }
 
         assertTrue("data doesn't return Sequentially!", testResult.getNumOfSequentials() == testResult.getNumOfGets());
         if (containerSize > 1) {
             assertTrue("Returning is the same all the time!", testResult.getNumOfRepeats() == 0);
         }
+    }
+
+    @Test
+    public void getRow() throws Exception {
+        int sizeBefore = paramsContainerSequential.getSize();
+        paramsContainerSequential.addRow(Generator.fillDataMap(sizeBefore));
+        assertTrue("data doesn't return Sequentially!", sizeBefore + 1 == paramsContainerSequential.getSize());
     }
 
     @Test
@@ -60,12 +64,12 @@ public class DataContainerSequentialTest extends TestData{
 
     @Test
     public void getSize() throws Exception {
-        assertTrue("DataContainer returns wrong size!",containerSize == paramsContainerSequential.getSize());
+        assertTrue("DataContainer returns wrong size!", containerSize == paramsContainerSequential.getSize());
     }
 
     @Test
     public void getRequestType() throws Exception {
-        assertTrue("DataContainer returns wrong RequestType!",paramsContainerSequential.getRequestType() == RequestType.SEQUENTIAL);
+        assertTrue("DataContainer returns wrong RequestType!", paramsContainerSequential.getRequestType() == RequestType.SEQUENTIAL);
     }
 
 }

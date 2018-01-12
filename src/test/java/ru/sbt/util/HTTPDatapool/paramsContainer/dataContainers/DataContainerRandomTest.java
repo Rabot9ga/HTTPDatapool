@@ -19,13 +19,20 @@ import static org.junit.Assert.*;
 @Slf4j
 public class DataContainerRandomTest extends TestData {
     @Test
-    public void getRow() throws Exception {
+    public void getRowFunctionalTest() throws Exception {
         TestResult testResult = TestUtils.gettingTest(paramsContainerRandom, containerSize);
 
         assertTrue("data doesn't return Sequentially!", testResult.getNumOfSequentials() < testResult.getNumOfGets());
         if (containerSize > 1) {
             assertTrue("Returning is the same all the time!", testResult.getNumOfRepeats() < testResult.getNumOfGets());
         }
+    }
+
+    @Test
+    public void getRow() throws Exception {
+        int sizeBefore = paramsContainerRandom.getSize();
+        paramsContainerRandom.addRow(Generator.fillDataMap(sizeBefore));
+        assertTrue("data doesn't return Sequentially!", sizeBefore + 1 == paramsContainerRandom.getSize());
     }
 
     @Test

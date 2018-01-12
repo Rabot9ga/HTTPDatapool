@@ -41,7 +41,7 @@ public class Generator {
         return container;
     }
 
-    static private HashMap<String, String> fillDataMap(int id) {
+    static public HashMap<String, String> fillDataMap(int id) {
         HashMap<String, String> map = new HashMap<>();
         map.put("id", Integer.toString(id));
         map.put("name", "Vasya_" + ThreadLocalRandom.current().nextInt(100));
