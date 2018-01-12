@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 @Builder
 public class HTTPRequestParam {
     Set<ParametersTable> parametersTables;
+    String scriptName;
 
     public Stream<ParametersTable> getParametersTablesStream() {
         return parametersTables.stream();

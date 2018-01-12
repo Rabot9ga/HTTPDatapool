@@ -17,6 +17,7 @@ public class ParametersTable {
     RequestType type;
     String tableName;
     Set<String> columnsName;
+    String scriptName;
 
     public Stream<String> getColumnsNameStream(){
         return columnsName.stream();
