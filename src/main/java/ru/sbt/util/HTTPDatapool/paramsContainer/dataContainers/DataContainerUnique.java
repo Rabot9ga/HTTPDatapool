@@ -4,6 +4,7 @@ import ru.sbt.util.HTTPDatapool.paramsContainer.api.DataContainerAPI;
 import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
 
 import java.lang.instrument.IllegalClassFormatException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -13,7 +14,7 @@ public class DataContainerUnique extends AbstractDataContainer implements DataCo
 
     ConcurrentLinkedQueue queue = new ConcurrentLinkedQueue<Map<String, String>>();
 
-    public DataContainerUnique(RequestType type) {
+    public DataContainerUnique(RequestType type, Collection collection) {
         if (!(type.equals(RequestType.UNIQUE_RANDOM) || type.equals(RequestType.UNIQUE_SEQUENTIAL)))
             throw new RuntimeException("Wrong RequestType format!", new IllegalClassFormatException("Creating Unique Data Container you must choose between UNIQUE_RANDOM and UNIQUE_SEQUENTIAL"));
         super.requestType = type;

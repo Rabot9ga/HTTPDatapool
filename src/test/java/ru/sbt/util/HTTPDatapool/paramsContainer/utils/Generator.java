@@ -12,19 +12,19 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Generator {
 
     static public DataContainerAPI fillDataContainerRandom(int size) {
-        return fillParamsContainer(DataContainerFactory.createRandom(), size);
+        return fillParamsContainer(DataContainerFactory.create(RequestType.RANDOM), size);
     }
 
     static public DataContainerAPI fillDataContainerSequential(int size) {
-        return fillParamsContainer(DataContainerFactory.createSequential(), size);
+        return fillParamsContainer(DataContainerFactory.create(RequestType.SEQUENTIAL), size);
     }
 
     static public DataContainerAPI fillDataContainerUniqueRandom(int size) {
-        return fillParamsContainer(DataContainerFactory.createUnique(RequestType.UNIQUE_RANDOM), size);
+        return fillParamsContainer(DataContainerFactory.create(RequestType.UNIQUE_RANDOM), size);
     }
 
     static public DataContainerAPI fillDataContainerUniqueSequential(int size) {
-        return fillParamsContainer(DataContainerFactory.createUnique(RequestType.UNIQUE_SEQUENTIAL), size);
+        return fillParamsContainer(DataContainerFactory.create(RequestType.UNIQUE_SEQUENTIAL), size);
     }
 
     static private DataContainerAPI fillParamsContainer(DataContainerAPI container, int size) {
