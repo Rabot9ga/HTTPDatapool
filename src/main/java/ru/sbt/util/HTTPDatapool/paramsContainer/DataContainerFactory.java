@@ -9,6 +9,7 @@ import ru.sbt.util.HTTPDatapool.paramsContainer.dataContainers.DataContainerUniq
 import java.lang.instrument.IllegalClassFormatException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,10 +23,10 @@ public class DataContainerFactory {
         return createContainer(type, null);
     }
 
-    public static DataContainerAPI create(RequestType type, ArrayList<Map<String, String>> collection) {
+    public static DataContainerAPI create(RequestType type, List<Map<String, String>> collection) {
         return createContainer(type, collection);
     }
-    private static DataContainerAPI createContainer(RequestType type, ArrayList<Map<String, String>> collection){
+    private static DataContainerAPI createContainer(RequestType type, List<Map<String, String>> collection){
         DataContainerAPI dataContainer;
 
         switch (type) {

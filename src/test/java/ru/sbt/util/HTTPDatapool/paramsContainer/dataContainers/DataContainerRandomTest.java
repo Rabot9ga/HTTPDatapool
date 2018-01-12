@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 
 @Slf4j
 public class DataContainerRandomTest {
-    private int containerSize = 15;
+    private int containerSize = 5;
     DataContainerAPI paramsContainerRandom = Generator.fillDataContainerRandom(containerSize);
 
     @Test

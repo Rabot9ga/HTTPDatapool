@@ -20,9 +20,9 @@ public interface DataContainerAPI {
      */
     void addRow(Map<String, String> row);
 
-    <T extends List> void addTable(ArrayList<Map<String, String>> collection);
+    <T extends List> void addTable(List<Map<String, String>> collection);
 
-    <T extends List> ArrayList<Map<String, String>> getTable();
+    <T extends List> List<Map<String, String>> getTable();
 
     int getSize();
 
