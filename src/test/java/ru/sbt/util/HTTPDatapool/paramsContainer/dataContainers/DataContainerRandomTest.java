@@ -8,11 +8,14 @@ import ru.sbt.util.HTTPDatapool.paramsContainer.dto.TestResult;
 import ru.sbt.util.HTTPDatapool.paramsContainer.utils.Generator;
 import ru.sbt.util.HTTPDatapool.paramsContainer.utils.TestUtils;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 import static org.junit.Assert.*;
 
 @Slf4j
 public class DataContainerRandomTest {
-    private int containerSize = 3;
+    private int containerSize = 15;
     DataContainerAPI paramsContainerRandom = Generator.fillDataContainerRandom(containerSize);
 
     @Test
@@ -22,9 +25,9 @@ public class DataContainerRandomTest {
             log.debug(paramsContainerRandom.getRow().get("id"));
         }
 
-        assertTrue("data doesn't return Sequentially!", testResult.getNumOfSequentials() < testResult.getNumOfGetts());
+        assertTrue("data doesn't return Sequentially!", testResult.getNumOfSequentials() < testResult.getNumOfGets());
         if (containerSize > 1) {
-            assertTrue("Returning is the same all the time!", testResult.getNumOfRepeats() < testResult.getNumOfGetts());
+            assertTrue("Returning is the same all the time!", testResult.getNumOfRepeats() < testResult.getNumOfGets());
         }
     }
 
@@ -36,13 +39,15 @@ public class DataContainerRandomTest {
         assertTrue(container.getSize() == container.getSize());
     }
 
-//    @Test
-//    public void addTable() throws Exception {
-//    }
-//
-//    @Test
-//    public void getTable() throws Exception {
-//    }
+    @Test
+    public void addTable() throws Exception {
+        ArrayList<Map<String, String>> list = new ArrayList<>();
+
+    }
+
+    @Test
+    public void getTable() throws Exception {
+    }
 
     @Test
     public void getSize() throws Exception {

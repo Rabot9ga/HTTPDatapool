@@ -9,6 +9,7 @@ import ru.sbt.util.HTTPDatapool.httpapi.ResponseTables;
 import ru.sbt.util.HTTPDatapool.httpapi.Status;
 import ru.sbt.util.HTTPDatapool.paramsContainer.DataContainerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -59,7 +60,7 @@ public class Datapool {
     private UUID createToken(ParametersTable parametersTable) {
         TableContainer tableContainer = TableContainer.builder()
                 .tableName(parametersTable.getTableName())
-                .container(DataContainerFactory.create(parametersTable.getType()))
+                .container(DataContainerFactory.create(parametersTable.getType(), new ArrayList()))
                 .build();
 
         UUID uuid = UUID.randomUUID();

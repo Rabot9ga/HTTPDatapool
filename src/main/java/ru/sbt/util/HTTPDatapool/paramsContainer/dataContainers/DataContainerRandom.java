@@ -8,11 +8,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class DataContainerRandom extends AbstractDataContainer implements DataContainerAPI{
-    private List<Map<String, String>> list = new ArrayList<>();
+public class DataContainerRandom extends AbstractDataContainer implements DataContainerAPI {
+    private ArrayList<Map<String, String>> list = new ArrayList<>();
 
-    public DataContainerRandom() {
+    public DataContainerRandom(ArrayList<Map<String, String>> collection) {
         super.requestType = RequestType.RANDOM;
+
+        // FIXME: 12.01.2018 Which type is preferable?
+
+        if (collection != null) {
+            this.addTable(collection);
+        }
     }
 
     @Override
@@ -26,13 +32,15 @@ public class DataContainerRandom extends AbstractDataContainer implements DataCo
     }
 
     @Override
-    public <T extends List> void addTable(T collection) {
-        throw new UnsupportedOperationException("Not supported yet");
+    public <T extends List> void addTable(ArrayList<Map<String, String>> collection) {
+        list = collection;
+//        throw new UnsupportedOperationException("Not supported yet");
     }
 
     @Override
-    public <T extends List> T getTable() {
-        throw new UnsupportedOperationException("Not supported yet");
+    public <T extends List> ArrayList<Map<String, String>> getTable() {
+        return list;
+        //        throw new UnsupportedOperationException("Not supported yet");
     }
 
     @Override

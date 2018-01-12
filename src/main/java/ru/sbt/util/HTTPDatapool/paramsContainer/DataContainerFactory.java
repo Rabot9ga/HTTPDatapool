@@ -7,6 +7,9 @@ import ru.sbt.util.HTTPDatapool.paramsContainer.dataContainers.DataContainerRand
 import ru.sbt.util.HTTPDatapool.paramsContainer.dataContainers.DataContainerUnique;
 
 import java.lang.instrument.IllegalClassFormatException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Class for providing composite object with ready for consuming structured parametrization
@@ -15,37 +18,31 @@ import java.lang.instrument.IllegalClassFormatException;
  */
 public class DataContainerFactory {
 
-    public static DataContainerAPI createRandom() {
-        return new DataContainerRandom();
-    }
-
-    public static DataContainerAPI createSequential() {
-        return new DataContainerSequential();
-    }
-
-    public static DataContainerAPI createUnique(RequestType type) {
-        return new DataContainerUnique(type);
-    }
-
     public static DataContainerAPI create(RequestType type) {
+        return createContainer(type, null);
+    }
+
+    public static DataContainerAPI create(RequestType type, ArrayList<Map<String, String>> collection) {
+        return createContainer(type, collection);
+    }
+    private static DataContainerAPI createContainer(RequestType type, ArrayList<Map<String, String>> collection){
         DataContainerAPI dataContainer;
 
         switch (type) {
             case RANDOM:
-                dataContainer = new DataContainerRandom();
+                dataContainer = new DataContainerRandom(collection);
                 break;
             case SEQUENTIAL:
-                dataContainer = new DataContainerSequential();
+                dataContainer = new DataContainerSequential(collection);
                 break;
             case UNIQUE_SEQUENTIAL:
-                dataContainer = new DataContainerUnique(type);
+                dataContainer = new DataContainerUnique(type, collection);
                 break;
             case UNIQUE_RANDOM:
-                dataContainer = new DataContainerUnique(type);
+                dataContainer = new DataContainerUnique(type, collection);
                 break;
-
             default:
-                throw new RuntimeException("Can't create Data Container: Wrong RequestType format!");
+                throw new RuntimeException("Can't create DataContainer", new IllegalArgumentException("Wrong RequestType format!"));
 
         }
         return dataContainer;
