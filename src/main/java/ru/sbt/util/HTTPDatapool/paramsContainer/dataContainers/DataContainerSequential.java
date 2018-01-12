@@ -5,6 +5,7 @@ import ru.sbt.util.HTTPDatapool.paramsContainer.api.DataContainerAPI;
 import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,7 +17,7 @@ public class DataContainerSequential extends AbstractDataContainer implements Da
 
     private AtomicInteger counter = new AtomicInteger();
 
-    public DataContainerSequential() {
+    public DataContainerSequential(Collection collection) {
         counter.set(0);
         super.requestType = RequestType.SEQUENTIAL;
     }

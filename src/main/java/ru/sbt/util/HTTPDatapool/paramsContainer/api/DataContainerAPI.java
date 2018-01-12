@@ -7,8 +7,6 @@ import java.util.Map;
 
 public interface DataContainerAPI {
 
-//    RequestType requestType = null;
-
     /**
      * getting required data from pool using specified RequestType
      *
@@ -19,7 +17,6 @@ public interface DataContainerAPI {
     /**
      * adding data to structured pool
      */
-//    <T extends Map<String, String>> void addRow(Map<String, String> t);
     void addRow(Map<String, String> row);
 
     <T extends List> void addTable(T collection);

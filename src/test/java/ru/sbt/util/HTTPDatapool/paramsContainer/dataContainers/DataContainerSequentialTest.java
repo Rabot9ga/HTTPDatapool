@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 @Slf4j
 public class DataContainerSequentialTest {
-    private int containerSize = 5;
+    private int containerSize = 15;
     DataContainerAPI paramsContainerSequential = Generator.fillDataContainerSequential(containerSize);
 
     @Test
