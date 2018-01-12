@@ -13,8 +13,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 public class Generator {
-    private static AtomicInteger idCounter = new AtomicInteger();
-
     static public DataContainerAPI fillDataContainerRandom(int size) {
         return fillParamsContainer(DataContainerFactory.create(RequestType.RANDOM), size);
     }
@@ -36,16 +34,15 @@ public class Generator {
         if (size <= 0) throw new NumberFormatException("Size must be positive!");
 
         for (int i = 0; i < size; i++) {
-            container.addRow(fillDataMap());
+            container.addRow(fillDataMap(i));
         }
         log.trace(container.toString());
         return container;
     }
 
-    static private HashMap<String, String> fillDataMap() {
+    static private HashMap<String, String> fillDataMap(int id) {
         HashMap<String, String> map = new HashMap<>();
-        log.debug("counter is {}", idCounter);
-        map.put("id", Integer.toString(idCounter.getAndIncrement()));
+        map.put("id", Integer.toString(id));
         map.put("name", "Vasya_" + ThreadLocalRandom.current().nextInt(100));
         map.put("phone", "7891-" + ThreadLocalRandom.current().nextInt(1000, 8999));
 
@@ -58,7 +55,7 @@ public class Generator {
         if (rows <= 0) throw new IllegalArgumentException("Number of rows must be > 0!");
 
         for (int i = 0; i < rows; i++) {
-            list.add(fillDataMap());
+            list.add(fillDataMap(i));
         }
 
         return list;

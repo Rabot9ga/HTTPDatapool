@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class DataContainerSequential extends AbstractDataContainer implements DataContainerAPI {
 
-    private ArrayList<Map<String, String>> list = new ArrayList<>();
+    private List<Map<String, String>> list = new ArrayList<>();
 
     private AtomicInteger counter = new AtomicInteger();
 
@@ -42,12 +42,12 @@ public class DataContainerSequential extends AbstractDataContainer implements Da
     }
 
     @Override
-    public <T extends List> ArrayList<Map<String, String>> getTable() {
+    public <T extends List> List<Map<String, String>> getTable() {
         return list;
     }
 
     @Override
-    public <T extends List> void addTable(ArrayList<Map<String, String>> collection) {
+    public <T extends List> void addTable(List<Map<String, String>> collection) {
         list = collection;
     }
     @Override

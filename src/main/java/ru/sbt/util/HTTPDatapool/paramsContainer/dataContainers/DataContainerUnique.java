@@ -37,7 +37,7 @@ public class DataContainerUnique extends AbstractDataContainer implements DataCo
     }
 
     @Override
-    public <T extends List> void addTable(ArrayList<Map<String, String>> collection) {
+    public <T extends List> void addTable(List<Map<String, String>> collection) {
         throw new UnsupportedOperationException("Not supported yet");
     }
 
