@@ -26,17 +26,17 @@ public class DatapoolTest {
     private Datapool datapool;
     private List<Map<String, String>> table;
     private HashSet<String> columns;
+    private DBConnection dbConnection;
 
     @Before
     public void setUp() throws Exception {
         datapool = new Datapool();
-        DBConnection dbConnection = mock(DBConnection.class);
+        dbConnection = mock(DBConnection.class);
         columns = new HashSet<>();
         columns.add("123");
         columns.add("31");
         columns.add("231");
-        when(dbConnection.getDataFromCache("Script1", columns)).thenReturn(Generator.genearateDataFromDB(20));
-        table = dbConnection.getDataFromCache("Script1", columns);
+
 
         datapool.dbConnection = dbConnection;
 
@@ -44,6 +44,8 @@ public class DatapoolTest {
 
     @Test
     public void getParameters() {
+        when(dbConnection.getDataFromCache("Script1", columns, false)).thenReturn(Generator.genearateDataFromDB(20));
+        table = dbConnection.getDataFromCache("Script1", columns, false);
 
         HashSet<ParametersTable> parametersTables = new HashSet<>();
 
@@ -69,8 +71,9 @@ public class DatapoolTest {
         Assert.assertNotEquals(responseTables.getToken(), null);
         Assert.assertEquals(responseTables.getStatus(), Status.SUCCESS);
         Assert.assertNotEquals(responseTables.getMapParameters(), null);
-
-
-
     }
+
+
+
+
 }

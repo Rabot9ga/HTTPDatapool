@@ -10,8 +10,8 @@ import java.util.UUID;
 @Builder
 public class ResponseTables {
 
-
     UUID token;
     Map<String, String> mapParameters;
     Status status;
+    String statusMessage;
 }

@@ -37,6 +37,7 @@ public class Datapool {
         return ResponseTables.builder()
                 .token(entry.getKey())
                 .mapParameters(data)
+                .status(Status.SUCCESS)
                 .build();
     }
 
@@ -64,7 +65,7 @@ public class Datapool {
     }
 
     private UUID createToken(ParametersTable parametersTable) {
-        List<Map<String, String>> dataFromCache = dbConnection.getDataFromCache(parametersTable.getTableName(), parametersTable.getColumnsName());
+        List<Map<String, String>> dataFromCache = dbConnection.getDataFromCache(parametersTable.getTableName(), parametersTable.getColumnsName(), false);
 
         TableContainer tableContainer = TableContainer.builder()
                 .tableName(parametersTable.getTableName())
