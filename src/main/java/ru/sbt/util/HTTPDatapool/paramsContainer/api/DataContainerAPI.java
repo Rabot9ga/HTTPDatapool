@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface DataContainerAPI {
 
-    RequestType requestType = null;
+//    RequestType requestType = null;
 
     /**
      * getting required data from pool using specified RequestType
