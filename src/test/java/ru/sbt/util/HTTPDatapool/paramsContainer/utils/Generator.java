@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 @Slf4j
 public class Generator {
@@ -49,7 +50,7 @@ public class Generator {
         return map;
     }
 
-    static private ArrayList<Map<String, String>> fillDataList(int rows) {
+    static public ArrayList<Map<String, String>> fillDataList(int rows) {
         ArrayList<Map<String, String>> list = new ArrayList<>();
 
         if (rows <= 0) throw new IllegalArgumentException("Number of rows must be > 0!");
@@ -60,5 +61,25 @@ public class Generator {
 
         return list;
     }
+
+//    static public ArrayList<Map<String, String>> fillDataListStream(int rows) {
+//
+//        ArrayList<Map<String, String>> list = new ArrayList<>();
+//        AtomicInteger ai = new AtomicInteger();
+//        ai.set(0);
+//
+//        ArrayList<Map<String, String>> list = Stream.generate(null)
+//                .limit(rows)
+//                .forEach(Generator::fillDataMap);
+//
+//
+//        if (rows <= 0) throw new IllegalArgumentException("Number of rows must be > 0!");
+//
+//        for (int i = 0; i < rows; i++) {
+//            list.add(fillDataMap(i));
+//        }
+//
+//        return list;
+//    }
 
 }
