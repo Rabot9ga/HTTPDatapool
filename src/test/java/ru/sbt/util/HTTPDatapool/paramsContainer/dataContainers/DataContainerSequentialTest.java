@@ -22,7 +22,7 @@ public class DataContainerSequentialTest {
             log.debug(paramsContainerSequential.getRow().get("id"));
         }
 
-        assertTrue("data doesn't return Sequentially!", testResult.getNumOfSequentials() == testResult.getNumOfGetts());
+        assertTrue("data doesn't return Sequentially!", testResult.getNumOfSequentials() == testResult.getNumOfGets());
         if (containerSize > 1) {
             assertTrue("Returning is the same all the time!", testResult.getNumOfRepeats() == 0);
         }
@@ -38,13 +38,13 @@ public class DataContainerSequentialTest {
         assertTrue(container.getSize() == container.getSize());
     }
 
-//    @Test
-//    public void getTable() throws Exception {
-//    }
-//
-//    @Test
-//    public void addTable() throws Exception {
-//    }
+    @Test
+    public void getTable() throws Exception {
+    }
+
+    @Test
+    public void addTable() throws Exception {
+    }
 
     @Test
     public void getSize() throws Exception {

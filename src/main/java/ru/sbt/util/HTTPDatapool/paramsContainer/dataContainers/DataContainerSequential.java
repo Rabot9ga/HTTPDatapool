@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class DataContainerSequential extends AbstractDataContainer implements DataContainerAPI {
 
-    private List<Map<String, String>> list = new ArrayList<>();
+    private ArrayList<Map<String, String>> list = new ArrayList<>();
 
     private AtomicInteger counter = new AtomicInteger();
 
@@ -42,13 +42,13 @@ public class DataContainerSequential extends AbstractDataContainer implements Da
     }
 
     @Override
-    public <T extends List> T getTable() {
-        throw new UnsupportedOperationException("Not supported yet");
+    public <T extends List> ArrayList<Map<String, String>> getTable() {
+        return list;
     }
 
     @Override
-    public <T extends List> void addTable(T collection) {
-        throw new UnsupportedOperationException("Not supported yet");
+    public <T extends List> void addTable(ArrayList<Map<String, String>> collection) {
+        list = collection;
     }
     @Override
     public int getSize() {

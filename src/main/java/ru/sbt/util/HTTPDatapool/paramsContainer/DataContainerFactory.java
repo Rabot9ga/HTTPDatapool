@@ -7,7 +7,9 @@ import ru.sbt.util.HTTPDatapool.paramsContainer.dataContainers.DataContainerRand
 import ru.sbt.util.HTTPDatapool.paramsContainer.dataContainers.DataContainerUnique;
 
 import java.lang.instrument.IllegalClassFormatException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Class for providing composite object with ready for consuming structured parametrization
@@ -20,10 +22,10 @@ public class DataContainerFactory {
         return createContainer(type, null);
     }
 
-    public static DataContainerAPI create(RequestType type, Collection collection) {
+    public static DataContainerAPI create(RequestType type, ArrayList<Map<String, String>> collection) {
         return createContainer(type, collection);
     }
-    private static DataContainerAPI createContainer(RequestType type, Collection collection){
+    private static DataContainerAPI createContainer(RequestType type, ArrayList<Map<String, String>> collection){
         DataContainerAPI dataContainer;
 
         switch (type) {

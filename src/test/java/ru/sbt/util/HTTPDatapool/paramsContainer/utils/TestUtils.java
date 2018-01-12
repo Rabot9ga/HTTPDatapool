@@ -17,8 +17,6 @@ public class TestUtils {
         // number of repeats during two requests
         int numOfRepeats = 0;
 
-        TestResult testResult = new TestResult();
-
         if (dataContainer.getSize() != size) {
             throw new AssertionError("paramsContainer size is not " + size + "!");
         }
@@ -37,8 +35,9 @@ public class TestUtils {
 
             if (row.get("id").equals(prevValue)) numOfRepeats++;
             log.trace("currRow id: {} / prevValue id: {}", row.get("id"), prevValue);
-            if (Integer.parseInt(row.get("id")) == ((Integer.parseInt(prevValue) + 1) % size))
+            if (Integer.parseInt(row.get("id")) == ((Integer.parseInt(prevValue) + 1) % size)) {
                 numOfSequentials++;
+            }
 
             prevValue = row.get("id");
         }
@@ -46,9 +45,11 @@ public class TestUtils {
         log.trace("\n == {} == \n NumOfGets: {} \n Number of how many times data returned sequentially = {} " +
                 "\n numOfRepeats : {}", dataContainer.getRequestType(), numOfGets, numOfSequentials, numOfRepeats);
 
-        testResult.withNumOfGetts(numOfGets)
-                .withNumOfRepeats(numOfRepeats)
-                .withNumOfSequentials(numOfSequentials);
+        TestResult testResult = TestResult.builder()
+                .numOfGets(numOfGets)
+                .numOfRepeats(numOfRepeats)
+                .numOfSequentials(numOfSequentials)
+                .build();
 
         return testResult;
     }

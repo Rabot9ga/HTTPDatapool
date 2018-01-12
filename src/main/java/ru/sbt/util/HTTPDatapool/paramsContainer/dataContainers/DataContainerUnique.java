@@ -4,6 +4,7 @@ import ru.sbt.util.HTTPDatapool.paramsContainer.api.DataContainerAPI;
 import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
 
 import java.lang.instrument.IllegalClassFormatException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -31,12 +32,12 @@ public class DataContainerUnique extends AbstractDataContainer implements DataCo
     }
 
     @Override
-    public <T extends List> T getTable() {
+    public <T extends List> ArrayList<Map<String, String>> getTable() {
         throw new UnsupportedOperationException("Not supported yet");
     }
 
     @Override
-    public <T extends List> void addTable(T collection) {
+    public <T extends List> void addTable(ArrayList<Map<String, String>> collection) {
         throw new UnsupportedOperationException("Not supported yet");
     }
 
