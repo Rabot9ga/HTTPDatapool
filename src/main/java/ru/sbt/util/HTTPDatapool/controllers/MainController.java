@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sbt.util.HTTPDatapool.httpapi.HTTPRequestParam;
-import ru.sbt.util.HTTPDatapool.httpapi.ResponseParam;
+import ru.sbt.util.HTTPDatapool.httpapi.HTTPResponseParam;
+import ru.sbt.util.HTTPDatapool.httpapi.ResponseTables;
 import ru.sbt.util.HTTPDatapool.datapool.Datapool;
 
 @RestController
@@ -19,15 +20,11 @@ public class MainController {
 
 
     @PostMapping("/init")
-    public ResponseEntity<ResponseParam> getParameter(@RequestBody HTTPRequestParam requestParam) {
+    public ResponseEntity<HTTPResponseParam> getParameter(@RequestBody HTTPRequestParam requestParam) {
 
-        ResponseParam responseParam;
-        if (requestParam.getToken() == null) {
-            responseParam = datapool.initParameter1(requestParam);
-        } else {
-            responseParam = datapool.getParameters1(requestParam);
-        }
 
-        return ResponseEntity.ok(responseParam);
+
+
+        return ResponseEntity.ok(null);
     }
 }

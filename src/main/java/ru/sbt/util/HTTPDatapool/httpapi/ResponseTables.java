@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class ResponseParam {
+public class ResponseTables {
 
 
     UUID token;

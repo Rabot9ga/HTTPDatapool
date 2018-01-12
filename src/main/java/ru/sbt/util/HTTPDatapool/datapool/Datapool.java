@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import ru.sbt.util.HTTPDatapool.connectionInterface.DBConnection;
 import ru.sbt.util.HTTPDatapool.httpapi.HTTPRequestParam;
 import ru.sbt.util.HTTPDatapool.httpapi.ParametersTable;
-import ru.sbt.util.HTTPDatapool.httpapi.ResponseParam;
+import ru.sbt.util.HTTPDatapool.httpapi.ResponseTables;
 import ru.sbt.util.HTTPDatapool.httpapi.Status;
 import ru.sbt.util.HTTPDatapool.paramsContainer.DataContainerFactory;
 
@@ -25,7 +25,7 @@ public class Datapool {
     // FIXME: 11.01.2018 тут будет не сет object'ов.
     Map<UUID, TableContainer> mapContainer = new ConcurrentHashMap<>();
 
-    public ResponseParam getParameters(HTTPRequestParam requestParam) {
+    public ResponseTables getParameters(HTTPRequestParam requestParam) {
 
         if (requestParam.getParametersTablesStream()
                 .anyMatch(parametersTable -> parametersTable.getToken() == null)) {
@@ -33,7 +33,7 @@ public class Datapool {
         }
 
 
-        return ResponseParam.builder()
+        return ResponseTables.builder()
 //                .token(uuid)
                 .status(Status.UPDATED)
                 // FIXME: 11.01.2018 передать параметры
