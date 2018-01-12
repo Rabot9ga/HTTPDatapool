@@ -34,9 +34,9 @@ public class DataRepositoryTest {
     public void getSomeColumnFromTable() {
 
 
-//        HashSet<String> columnNames =  new HashSet<> (Arrays.asList("PARTY_ID","NAME"));
-//        List<Map<String, Object>> result = dataRepository.getSomeColumnFromTable("ID_FIO_DOC_INDIVIDUAL",columnNames);
-//        assertTrue(result.size()>0);
+        HashSet<String> columnNames =  new HashSet<> (Arrays.asList("PARTY_ID","NAME"));
+        List<Map<String, String>> result = dataRepository.getDataFromCache("ID_FIO_DOC_INDIVIDUAL",columnNames,false);
+        assertTrue(result.size()>0);
 
     }
 
