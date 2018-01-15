@@ -48,12 +48,7 @@ public class DataRepository implements DBConnection {
         if (updateFlag) {
             cache.replace(tableName, getTable(tableName));
         }
-        if (cache.containsKey(tableName)) {
-            return resultConstruct(tableName, columnNames);
-        } else {
-            cache.put(tableName, getTable(tableName));
-            return resultConstruct(tableName, columnNames);
-        }
+        return resultConstruct(tableName, columnNames);
 
     }
 
@@ -62,12 +57,18 @@ public class DataRepository implements DBConnection {
                 .filter(entry -> entry.getKey().equals(tableName))
                 .map(Map.Entry::getValue)
                 .findAny()
-                .orElse(cache.put(tableName, getTable(tableName)));
+                .orElseGet(() -> cachePut(tableName));
 
         return table.stream()
                 .map(stringStringMap -> filterTableByColumns(stringStringMap, columnNames))
                 .collect(Collectors.toList());
 
+    }
+
+    private List<Map<String, String>> cachePut(String tableName) {
+        List<Map<String, String>> table = getTable(tableName);
+        cache.put(tableName, table);
+        return table;
     }
 
     private Map<String, String> filterTableByColumns(Map<String, String> stringStringMap, Set<String> columnNames) {

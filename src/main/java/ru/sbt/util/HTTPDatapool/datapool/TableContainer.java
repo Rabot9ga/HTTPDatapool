@@ -25,6 +25,7 @@ public class TableContainer {
     }
 
     public boolean isFit(ParametersTable parametersTable){
+
         return this.tableName.equals(parametersTable.getTableName())
                 && this.scriptName.equals(parametersTable.getScriptName())
                 && this.columnsName.containsAll(parametersTable.getColumnsName())

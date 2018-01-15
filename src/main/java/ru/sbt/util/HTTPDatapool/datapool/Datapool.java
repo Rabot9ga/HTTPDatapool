@@ -8,6 +8,7 @@ import ru.sbt.util.HTTPDatapool.paramsContainer.DataContainerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,7 +32,7 @@ public class Datapool {
     }
 
 
-    private ResponseTables createResponseTables(Map.Entry<UUID, ParametersTable> entry){
+    private ResponseTables createResponseTables(Map.Entry<UUID, ParametersTable> entry) {
         Map<String, String> data = mapContainer.get(entry.getKey()).getData();
 
         return ResponseTables.builder()
@@ -60,8 +61,9 @@ public class Datapool {
         return streamFromMapParameters()
                 .filter(uuidTableContainerEntry -> uuidTableContainerEntry.getValue().isFit(parametersTable))
                 .map(Map.Entry::getKey)
-                .findAny()
-                .orElse(createToken(parametersTable));
+                .findFirst()
+                .orElseGet(() -> createToken(parametersTable));
+
     }
 
     private UUID createToken(ParametersTable parametersTable) {

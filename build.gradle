@@ -65,4 +65,5 @@ dependencies {
 	compileOnly('org.projectlombok:lombok')
 	testCompileOnly('org.projectlombok:lombok')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile('org.testng:testng:6.9.9')
 }
