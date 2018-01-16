@@ -8,16 +8,14 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 public class DataContainerSequential extends AbstractDataContainer implements DataContainerAPI {
 
-//    private List<Map<String, String>> list = new ArrayList<>(500_000);
-//    private List<Map<String, String>> list = new CopyOnWriteArrayList();
-//    private List<Map<String, String>> list = Collections.synchronizedList(new ArrayList<>(500_000));
     private Deque<Map<String, String>> queueIn = new ConcurrentLinkedDeque<>();
-    private Deque<Map<String, String>> queueOut = new ConcurrentLinkedDeque();
+    private List<Map<String, String>> list = new CopyOnWriteArrayList<>();
 
     private AtomicInteger counter = new AtomicInteger();
 
@@ -34,34 +32,35 @@ public class DataContainerSequential extends AbstractDataContainer implements Da
 
         Map<String, String> row;
 
-        synchronized (this){
-            row = queueIn.poll();
-            if (row == null) {
-                //queueIn has ended. We swap queues with each other
-                Deque<Map<String, String>> queueTemp = queueOut;
-                queueOut = queueIn;
-                queueIn = queueTemp;
 
+        row = queueIn.poll();
+        if (row == null) {
+            synchronized (this) {
                 row = queueIn.poll();
+                if (row == null) {
+                    //queueIn has ended. We swap queues with each other
+                    queueIn.addAll(list);
+                    row = queueIn.poll();
+                }
             }
-            queueOut.addLast(row);
         }
         return row;
     }
 
     @Override
     public void addRow(Map<String, String> row) {
-        queueIn.add(row);
+        list.add(row);
+        queueIn.addLast(row);
     }
 
     @Override
     public void addTable(List<Map<String, String>> collection) {
-        queueIn.addAll(collection);
+        list.addAll(collection);
     }
 
     @Override
     public int getSize() {
-        return queueIn.size();
+        return list.size();
     }
 
     @Override
