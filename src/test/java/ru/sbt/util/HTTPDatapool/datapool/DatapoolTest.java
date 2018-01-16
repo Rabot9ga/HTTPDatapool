@@ -1,11 +1,13 @@
 package ru.sbt.util.HTTPDatapool.datapool;
 
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.assertj.core.groups.Tuple;
+import org.mockito.Mockito;
 import org.testng.Assert;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 import ru.sbt.util.HTTPDatapool.connectionInterface.DBConnection;
 import ru.sbt.util.HTTPDatapool.httpapi.*;
 import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
@@ -14,12 +16,9 @@ import ru.sbt.util.HTTPDatapool.paramsContainer.utils.Generator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.function.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.StreamSupport;
 
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @Slf4j
@@ -32,10 +31,10 @@ public class DatapoolTest {
 
     private Map<String, List<Map<String, String>>> tableMap;
 
-    @BeforeClass
-    public void setUpClass() throws Exception {
+    @BeforeTest
+    public void setUp() throws Exception {
 
-        dbConnection = mock(DBConnection.class);
+        dbConnection = Mockito.mock(DBConnection.class);
         columns = new HashSet<>();
         columns.add("123");
         columns.add("31");
@@ -43,48 +42,15 @@ public class DatapoolTest {
 
         tableMap = IntStream.range(1, 11)
                 .mapToObj(value -> "Script" + value)
-                .map(value -> ImmutablePair.of(value, Generator.genearateDataFromDB(20)))
+                .map(value -> ImmutablePair.of(value, Generator.fillDataList(2)))
                 .collect(Collectors.toMap(o -> o.left, o -> o.right));
 
 
-        tableMap.forEach((key, value) -> when(dbConnection.getDataFromCache(key, columns, false)).thenReturn(tableMap.get(key)));
-        tableMap.forEach((key, value) -> when(dbConnection.getDataFromCache(key, columns, true)).thenReturn(tableMap.get(key)));
+        tableMap.forEach((key, value) -> when(dbConnection.getDataFromCache(key, columns)).thenReturn(tableMap.get(key)));
 
-    }
-
-    @BeforeMethod
-    public void setUp() throws Exception {
         datapool = new Datapool();
         datapool.dbConnection = dbConnection;
     }
-
-    @Test(invocationCount = 10)
-    public void getParameters_1script() {
-        List<Map<String, String>> tableData = dbConnection.getDataFromCache("Script1", columns, false);
-
-        log.debug("Test table data: \n{}", tableData);
-        HashSet<ParametersTable> parametersTables = new HashSet<>();
-
-        ParametersTable table = ParametersTable.builder()
-                .columnsName(columns)
-                .tableName("Script1")
-                .scriptName("Script1")
-                .type(RequestType.RANDOM).build();
-
-        parametersTables.add(table);
-
-
-        HTTPRequestParam requestParam = HTTPRequestParam.builder().parametersTables(parametersTables).build();
-        HTTPResponseParam parameters = datapool.getParameters(requestParam);
-
-
-        log.debug("ResponseTables:\n {}", parameters);
-        log.debug("Datapool map:\n {}", datapool.mapContainer);
-        parameters.getResponseTablesStream().forEach(responseTables -> assertResponse(responseTables, tableData));
-
-        Assert.assertEquals(datapool.mapContainer.size(), 1);
-    }
-
 
     @DataProvider(name = "concurrentGetParameters", parallel = true)
     public Object[][] concurrentGetParameters() {
@@ -106,33 +72,50 @@ public class DatapoolTest {
         Object[][] output = new Object[paramsTable.size()][2];
 
         for (int i = 0; i < paramsTable.size(); i++) {
-                output[i][0] = paramsTable.get(i);
-                output[i][1] = parametersFromDB.get(i);
+            output[i][0] = paramsTable.get(i);
+            output[i][1] = parametersFromDB.get(i);
         }
 
         return output;
     }
 
-    @Test(invocationCount = 100, threadPoolSize = 10, dataProvider = "concurrentGetParameters")
+    @Test(invocationCount = 100, threadPoolSize = 2, dataProvider = "concurrentGetParameters")
     public void testConcurrentGetParameters(ParametersTable parametersTable, List<Map<String, String>> parametersFromDB) throws Exception {
-        HashSet<ParametersTable> parametersTables = new HashSet<>();
-        parametersTables.add(parametersTable);
-        HTTPRequestParam requestParam = HTTPRequestParam.builder().parametersTables(parametersTables).build();
-        HTTPResponseParam parameters = datapool.getParameters(requestParam);
-
-        parameters.getResponseTablesStream().forEach(responseTables -> assertResponse(responseTables, parametersFromDB));
+        testGet(parametersTable, parametersFromDB);
 
     }
 
+    @Test(invocationCount = 100, dataProvider = "concurrentGetParameters", singleThreaded = true)
+    public void testGetParameters(ParametersTable parametersTable, List<Map<String, String>> parametersFromDB) throws Exception {
+        testGet(parametersTable, parametersFromDB);
+
+    }
+
+    private void testGet(ParametersTable parametersTable, List<Map<String, String>> parametersFromDB) {
+        log.debug("ParametersTable: {}", parametersTable);
+        log.debug("ParametersFromDB: {}", parametersFromDB);
+
+        HashSet<ParametersTable> parametersTables = new HashSet<>();
+        parametersTables.add(parametersTable);
+        HTTPRequestParam requestParam = HTTPRequestParam.builder().parametersTables(parametersTables).build();
+        HTTPResponseParam parameters = null;
+//        synchronized (datapool){
+        parameters = datapool.getParameters(requestParam);
+//        }
+
+        parameters.getResponseTables().forEach((parametersTable1, responseTables) -> assertResponse(responseTables, parametersFromDB));
+    }
+
     @AfterTest
-    public void checkSizeHashMap(){
-        log.debug("datapool.mapContainer.size() = {}", datapool.mapContainer.size());
-        Assert.assertTrue(datapool.mapContainer.size() <= 10);
+    public void checkSizeHashMap() {
+        log.debug("datapool.mapContainer.mappingCount() = {}", datapool.mapContainer.mappingCount());
+        log.debug("datapool.mapContainer: {}", datapool.mapContainer);
+        Assert.assertEquals(datapool.mapContainer.mappingCount(), 10);
     }
 
 
     private void assertResponse(ResponseTables responseTables, List<Map<String, String>> tableData) {
-        Assert.assertNotEquals(responseTables.getToken(), null);
+
         Assert.assertEquals(responseTables.getStatus(), Status.SUCCESS);
         Assert.assertTrue(tableData.contains(responseTables.getMapParameters()));
     }

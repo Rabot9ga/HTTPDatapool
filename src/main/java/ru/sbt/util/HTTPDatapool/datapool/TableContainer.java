@@ -1,13 +1,15 @@
 package ru.sbt.util.HTTPDatapool.datapool;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
 import ru.sbt.util.HTTPDatapool.httpapi.ParametersTable;
 import ru.sbt.util.HTTPDatapool.paramsContainer.api.DataContainerAPI;
 import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
 
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 @Data
 @Builder
@@ -32,8 +34,16 @@ public class TableContainer {
                 && this.container.getRequestType() == parametersTable.getType();
     }
 
-    public Map<String, String> getData() {
+    public Map<String, String> getDataOrElse(Supplier<List<Map<String, String>>> supplier) {
+        if (container.getSize() <= 0){
+            synchronized (container){
+                if (container.getSize() <= 0){
+                    container.addTable(supplier.get());
+                }
+            }
+        }
         return container.getRow();
     }
+
 
 }

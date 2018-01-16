@@ -3,15 +3,11 @@ package ru.sbt.util.HTTPDatapool.httpapi;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.Set;
-import java.util.stream.Stream;
+import java.util.Map;
 
 @Data
 @Builder
 public class HTTPResponseParam {
-    Set<ResponseTables> responseTables;
+    Map<ParametersTable, ResponseTables> responseTables;
 
-    public Stream<ResponseTables> getResponseTablesStream(){
-        return responseTables.stream();
-    }
 }

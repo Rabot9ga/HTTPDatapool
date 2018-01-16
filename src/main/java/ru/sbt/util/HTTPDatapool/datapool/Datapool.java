@@ -1,16 +1,16 @@
 package ru.sbt.util.HTTPDatapool.datapool;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.sbt.util.HTTPDatapool.connectionInterface.DBConnection;
 import ru.sbt.util.HTTPDatapool.httpapi.*;
 import ru.sbt.util.HTTPDatapool.paramsContainer.DataContainerFactory;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 public class Datapool {
@@ -18,73 +18,46 @@ public class Datapool {
     @Autowired
     DBConnection dbConnection;
 
-    Map<UUID, TableContainer> mapContainer = new ConcurrentHashMap<>();
+    ConcurrentHashMap<ParametersTable, TableContainer> mapContainer = new ConcurrentHashMap<>();
 
     public HTTPResponseParam getParameters(HTTPRequestParam requestParam) {
 
-        Map<UUID, ParametersTable> tokens = findTokens(requestParam);
+        Map<ParametersTable, ResponseTables> responseMap = requestParam.getParametersTablesStream()
+                .map(parametersTable -> Pair.of(parametersTable, Optional.ofNullable(mapContainer.get(parametersTable))))
+                .map(pair -> Pair.of(pair.getLeft(), pair.getRight().orElseGet(() -> createTableContainer(pair.getLeft()))))
+                .collect(Collectors.toMap(Pair::getLeft, pair -> buildResponseTable(pair.getRight())));
 
-        Set<ResponseTables> responses = tokens.entrySet().stream()
-                .map(this::createResponseTables)
-                .collect(Collectors.toSet());
-
-        return HTTPResponseParam.builder().responseTables(responses).build();
+        return HTTPResponseParam.builder().responseTables(responseMap).build();
     }
 
-
-    private ResponseTables createResponseTables(Map.Entry<UUID, ParametersTable> entry) {
-        Map<String, String> data = mapContainer.get(entry.getKey()).getData();
-
+    private ResponseTables buildResponseTable(TableContainer tableContainer) {
         return ResponseTables.builder()
-                .token(entry.getKey())
-                .mapParameters(data)
+                .mapParameters(getDataFromContainer(tableContainer))
                 .status(Status.SUCCESS)
                 .build();
     }
 
-    private Map<UUID, ParametersTable> findTokens(HTTPRequestParam requestParam) {
-        return requestParam.getParametersTablesStream()
-                .collect(Collectors.toMap(this::findOrCreateToken, o -> o));
 
+    private Map<String, String> getDataFromContainer(TableContainer tableContainer) {
+        return tableContainer.getDataOrElse(
+                () -> dbConnection.getDataFromCache(
+                        tableContainer.getTableName(),
+                        tableContainer.getColumnsName()));
     }
 
-    private UUID findOrCreateToken(ParametersTable parametersTable) {
-        // TODO: 12.01.2018 Че-нить придумать, чтобы не делать 2 раза гет из мапы
-        UUID token = parametersTable.getToken();
-        if (token != null) {
-            if (mapContainer.containsKey(token)) {
-                TableContainer tableContainer = mapContainer.get(token);
-                if (tableContainer.isFit(parametersTable)) return token;
-            }
-        }
-
-        return streamFromMapParameters()
-                .filter(uuidTableContainerEntry -> uuidTableContainerEntry.getValue().isFit(parametersTable))
-                .map(Map.Entry::getKey)
-                .findFirst()
-                .orElseGet(() -> createToken(parametersTable));
-
-    }
-
-    private UUID createToken(ParametersTable parametersTable) {
-        List<Map<String, String>> dataFromCache = dbConnection.getDataFromCache(parametersTable.getTableName(), parametersTable.getColumnsName(), false);
-
-        TableContainer tableContainer = TableContainer.builder()
-                .tableName(parametersTable.getTableName())
-                .columnsName(parametersTable.getColumnsName())
+    private TableContainer createTableContainer(ParametersTable parametersTable) {
+        TableContainer container = TableContainer.builder()
                 .scriptName(parametersTable.getScriptName())
-                .container(DataContainerFactory.create(parametersTable.getType(), dataFromCache))
+                .columnsName(parametersTable.getColumnsName())
+                .container(DataContainerFactory.create(parametersTable.getType()))
+                .tableName(parametersTable.getTableName())
                 .build();
 
-        UUID uuid = UUID.randomUUID();
-        mapContainer.put(uuid, tableContainer);
-        return uuid;
+        TableContainer tableContainer = mapContainer.putIfAbsent(parametersTable, container);
+        if (tableContainer == null) {
+            tableContainer = mapContainer.get(parametersTable);
+        }
+        return tableContainer;
     }
-
-
-    private Stream<Map.Entry<UUID, TableContainer>> streamFromMapParameters() {
-        return mapContainer.entrySet().stream();
-    }
-
 
 }
