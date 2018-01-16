@@ -2,7 +2,6 @@ package ru.sbt.util.HTTPDatapool.paramsContainer.api;
 
 import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,9 +19,7 @@ public interface DataContainerAPI {
      */
     void addRow(Map<String, String> row);
 
-    <T extends List> void addTable(List<Map<String, String>> collection);
-
-    <T extends List> List<Map<String, String>> getTable();
+    void addTable(List<Map<String, String>> collection);
 
     int getSize();
 

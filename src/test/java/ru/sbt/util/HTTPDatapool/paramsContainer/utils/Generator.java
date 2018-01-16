@@ -60,5 +60,4 @@ public class Generator {
 
         return list;
     }
-
 }
