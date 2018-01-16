@@ -7,7 +7,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.sbt.util.HTTPDatapool.connectionInterface.DBConnection;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,26 +30,38 @@ public class DataRepository implements DBConnection {
     }
 
 
-    private List<Map<String, String>> getSomeColumnFromTable(String tablename, Set<String> columnNames) throws DataAccessException {
-        String query = "SELECT ";
-        for (String columnName : columnNames) {
-            query += columnName + ", ";
-        }
-        query = query.substring(0, query.lastIndexOf(','));
-        query += " FROM " + tablename;
+    private List<Map<String, String>> getFromTableBetween(String tableName, int from, int to) throws DataAccessException {
+
+        String query = "SELECT * FROM (SELECT ROWNUM NUM, A.* FROM "+tableName+" A) B ";
+        query += "WHERE B.NUM BETWEEN "+from+" and "+to;
         return jdbcTemplate.queryForList(query).stream()
                 .map(this::castMapValue)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Map<String, String>> getDataFromCache(String tableName, Set<String> columnNames, boolean updateFlag) {
-        if (updateFlag) {
-            cache.replace(tableName, getTable(tableName));
-        }
+    public List<Map<String, String>> getDataFromCache(String tableName, Set<String> columnNames) {
+
         return resultConstruct(tableName, columnNames);
 
     }
+
+    @Override
+    public List<Map<String, String>> getDataFromCacheBetween(String tableName, Set<String> columnNames, int from, int to) {
+       if(cache.containsKey(tableName)) {
+           cache.replace(tableName, getDataFromCacheBetween(tableName,columnNames,from,to));
+       }else{
+           cache.put(tableName,getFromTableBetween(tableName,from,to));
+       }
+       return cache.get(tableName);
+
+    }
+
+    @Override
+    public void clearCache() {
+        cache.clear();
+    }
+
 
     private List<Map<String, String>> resultConstruct(String tableName, Set<String> columnNames) {
         List<Map<String, String>> table = cache.entrySet().stream()

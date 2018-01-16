@@ -8,5 +8,11 @@ import java.util.Set;
 
 public interface DBConnection {
 
-      List<Map<String, String>> getDataFromCache(String tablenamem, Set<String> columnNames, boolean updateFlag);
+      List<Map<String, String>> getDataFromCache(String tableName, Set<String> columnNames);
+
+      List<Map<String, String>> getDataFromCacheBetween(String tableName, Set<String> columnNames, int from, int to);
+
+      void clearCache();
+
+
 }
