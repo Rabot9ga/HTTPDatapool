@@ -13,13 +13,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class DataContainerSequential extends AbstractDataContainer implements DataContainerAPI {
 
-    private List<Map<String, String>> list = new ArrayList<>();
+    private List<Map<String, String>> list = new ArrayList<>(500_000);
 
     private AtomicInteger counter = new AtomicInteger();
 
-    public DataContainerSequential(Collection collection) {
+    public DataContainerSequential(List<Map<String, String>> collection) {
         counter.set(0);
         super.requestType = RequestType.SEQUENTIAL;
+        if (collection != null) {
+            this.addTable(collection);
+        }
     }
 
     @Override
@@ -50,6 +53,7 @@ public class DataContainerSequential extends AbstractDataContainer implements Da
     public <T extends List> void addTable(List<Map<String, String>> collection) {
         list = collection;
     }
+
     @Override
     public int getSize() {
         return list.size();

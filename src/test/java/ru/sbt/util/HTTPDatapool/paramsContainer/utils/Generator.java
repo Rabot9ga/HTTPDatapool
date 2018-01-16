@@ -7,10 +7,10 @@ import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 @Slf4j
 public class Generator {
@@ -41,7 +41,7 @@ public class Generator {
         return container;
     }
 
-    static private HashMap<String, String> fillDataMap(int id) {
+    static public HashMap<String, String> fillDataMap(int id) {
         HashMap<String, String> map = new HashMap<>();
         map.put("id", Integer.toString(id));
         map.put("name", "Vasya_" + ThreadLocalRandom.current().nextInt(100));
@@ -50,7 +50,7 @@ public class Generator {
         return map;
     }
 
-    static private ArrayList<Map<String, String>> fillDataList(int rows) {
+    static public ArrayList<Map<String, String>> fillDataList(int rows) {
         ArrayList<Map<String, String>> list = new ArrayList<>();
 
         if (rows <= 0) throw new IllegalArgumentException("Number of rows must be > 0!");
@@ -59,22 +59,6 @@ public class Generator {
             list.add(fillDataMap(i));
         }
 
-        return list;
-    }
-
-    static public List<Map<String, String>> genearateDataFromDB(int size){
-        if (size <= 0) throw new NumberFormatException("Size must be positive!");
-
-        List<Map<String, String>> list = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            HashMap<String, String> map = new HashMap<>();
-            map.put("id", Integer.toString(i));
-            map.put("name", "Vasya_" + ThreadLocalRandom.current().nextInt(100));
-            map.put("phone", "7891-" + ThreadLocalRandom.current().nextInt(1000, 8999));
-            list.add(map);
-        }
-
-        log.trace(list.toString());
         return list;
     }
 

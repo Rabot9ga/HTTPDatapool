@@ -10,6 +10,13 @@ import java.util.Map;
 public class TestUtils {
 
     public static TestResult gettingTest(DataContainerAPI dataContainer, int size) {
+        int checkFactor;
+
+        if (size < 20) checkFactor = 4;
+        else checkFactor = 1;
+
+        // number of gets from dataContainer
+        int numOfGets = dataContainer.getSize() * checkFactor;
 
         // number of occurrences when data is returning sequentially
         int numOfSequentials = 0;
@@ -25,16 +32,18 @@ public class TestUtils {
         String prevValue = row0.get("id");
         log.trace("In test of {}. Returned id: {}", dataContainer.getRequestType(), row0.get("id"));
 
-        int numOfGets = dataContainer.getSize() * 4;
 
+        Map<String, String> row;
         for (int i = 0; i < numOfGets; i++) {
 
-            Map<String, String> row = dataContainer.getRow();
+            row = dataContainer.getRow();
 
             log.trace("In test of {}. Returned id: {}", dataContainer.getRequestType(), row.get("id"));
 
             if (row.get("id").equals(prevValue)) numOfRepeats++;
+
             log.trace("currRow id: {} / prevValue id: {}", row.get("id"), prevValue);
+
             if (Integer.parseInt(row.get("id")) == ((Integer.parseInt(prevValue) + 1) % size)) {
                 numOfSequentials++;
             }

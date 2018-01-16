@@ -9,13 +9,10 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class DataContainerRandom extends AbstractDataContainer implements DataContainerAPI {
-    private List<Map<String, String>> list = new ArrayList<>();
+    private List<Map<String, String>> list = new ArrayList<>(500_000);
 
     public DataContainerRandom(List<Map<String, String>> collection) {
         super.requestType = RequestType.RANDOM;
-
-        // FIXME: 12.01.2018 Which type is preferable?
-
         if (collection != null) {
             this.addTable(collection);
         }
@@ -36,13 +33,11 @@ public class DataContainerRandom extends AbstractDataContainer implements DataCo
     @Override
     public <T extends List> void addTable(List<Map<String, String>> collection) {
         list = collection;
-//        throw new UnsupportedOperationException("Not supported yet");
     }
 
     @Override
     public <T extends List> List<Map<String, String>> getTable() {
         return list;
-        //        throw new UnsupportedOperationException("Not supported yet");
     }
 
     @Override
