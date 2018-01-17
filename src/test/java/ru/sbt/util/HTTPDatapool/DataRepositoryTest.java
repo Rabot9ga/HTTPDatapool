@@ -1,23 +1,24 @@
 package ru.sbt.util.HTTPDatapool;
 
 
-import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
-import org.testng.annotations.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
+import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
+import org.testng.annotations.Test;
 import ru.sbt.util.HTTPDatapool.repository.DataRepository;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 
 @SpringBootTest
-public class DataRepositoryTest extends AbstractTransactionalTestNGSpringContextTests{
-
+public class DataRepositoryTest extends AbstractTransactionalTestNGSpringContextTests {
 
 
     @Autowired
@@ -26,9 +27,10 @@ public class DataRepositoryTest extends AbstractTransactionalTestNGSpringContext
     @Test
     public void getSomeColumnFromTableBetween() {
 
-        HashSet<String> columnNames =  new HashSet<> (Arrays.asList("ID","NAME"));
-        List<Map<String, String>> result = dataRepository.getDataFromCacheBetween("FORTEST",columnNames,2,3);
-        assertTrue( (result.size()==2)&& (result.get(0).get("ID").equals("124"))&&(result.get(1).get("NAME").equals("NDDF")));
+        HashSet<String> columnNames = new HashSet<>(Arrays.asList("PARTY_ID", "GIVEN_NAME", "MIDDLE_NAME", "FAMILY_NAME"));
+        List<Map<String, String>> result = dataRepository.getDataFromCacheBetween("TEST_TABLE", columnNames, 0, 600);
+
+        assertTrue((result.size() == 2) && (result.get(0).get("ID").equals("124")) && (result.get(1).get("NAME").equals("NDDF")));
 
     }
 
@@ -36,9 +38,49 @@ public class DataRepositoryTest extends AbstractTransactionalTestNGSpringContext
     public void getSomeColumnFromTable() {
 
 
-        HashSet<String> columnNames =  new HashSet<> (Arrays.asList("PARTY_ID","NAME"));
-        List<Map<String, String>> result = dataRepository.getDataFromCache("ID_FIO_DOC_INDIVIDUAL",columnNames);
-        assertTrue(result.size()>0);
+        HashSet<String> columnNames = new HashSet<>(Arrays.asList("PARTY_ID", "GIVEN_NAME", "MIDDLE_NAME", "FAMILY_NAME"));
+        List<Map<String, String>> result = dataRepository.getDataFromCache("TEST_TABLE", columnNames);
+
+        assertTrue(result.size() > 0);
+
+    }
+
+    @Test
+    public void getSomeColumnFromTableThread() {
+        HashSet<String> columnNames = new HashSet<>(Arrays.asList("PARTY_ID", "GIVEN_NAME", "MIDDLE_NAME", "FAMILY_NAME"));
+        CustomizableThreadFactory selectThread = new CustomizableThreadFactory("selectThread");
+        int countRows = 50000;
+        int countRowsOneSelect = 500;
+        int countThread = 10;
+        ExecutorService service = Executors.newFixedThreadPool(countThread, selectThread);
+
+
+        long start = System.nanoTime();
+
+        List<Future<List<Map<String, String>>>> futures = new ArrayList<>();
+        for (int i = 0; i < countRows / countRowsOneSelect; i++) {
+            int from = i * countRowsOneSelect + 1;
+            int to = (i + 1) * countRowsOneSelect;
+            futures.add(service.submit(() -> dataRepository.getDataFromCacheBetween("TEST_TABLE", columnNames, from, to)));
+        }
+
+
+        List<Map<String, String>> result = new ArrayList<>();
+        for (Future<List<Map<String, String>>> future : futures) {
+            while (!future.isDone()) {
+            }
+            try {
+                result.addAll(future.get());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        long stop = System.nanoTime();
+
+        logger.info((stop - start) / 1000000000);
+
 
     }
 
