@@ -31,13 +31,8 @@ public class DataContainerRandom extends AbstractDataContainer implements DataCo
     }
 
     @Override
-    public <T extends List> void addTable(List<Map<String, String>> collection) {
+    public void addTable(List<Map<String, String>> collection) {
         list = collection;
-    }
-
-    @Override
-    public <T extends List> List<Map<String, String>> getTable() {
-        return list;
     }
 
     @Override

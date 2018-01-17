@@ -16,5 +16,4 @@ public interface DBConnection {
 
     void clearCache();
 
-
 }

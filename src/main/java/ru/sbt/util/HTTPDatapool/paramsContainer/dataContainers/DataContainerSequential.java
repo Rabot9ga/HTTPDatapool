@@ -4,16 +4,18 @@ import lombok.extern.slf4j.Slf4j;
 import ru.sbt.util.HTTPDatapool.paramsContainer.api.DataContainerAPI;
 import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 public class DataContainerSequential extends AbstractDataContainer implements DataContainerAPI {
 
-    private List<Map<String, String>> list = new ArrayList<>(500_000);
+    private Deque<Map<String, String>> queueIn = new ConcurrentLinkedDeque<>();
+    private List<Map<String, String>> list = new CopyOnWriteArrayList<>();
 
     private AtomicInteger counter = new AtomicInteger();
 
@@ -26,32 +28,34 @@ public class DataContainerSequential extends AbstractDataContainer implements Da
     }
 
     @Override
-    public synchronized Map<String, String> getRow() {
-        Map<String, String> map = list.get(counter.get());
-//        log.debug("list.size() is: {} / counter is {} / get is:  {}", list.size(), counter, list.get(counter.get()));
+    public Map<String, String> getRow() {
 
-        // FIXME: 11.01.2018 IT SEEMS TO BE SHITTY
-        if (counter.get() + 1 == list.size()) {
-            counter.set(0);
-        } else {
-            counter.getAndIncrement();
+        Map<String, String> row;
+
+
+        row = queueIn.poll();
+        if (row == null) {
+            synchronized (this) {
+                row = queueIn.poll();
+                if (row == null) {
+                    //queueIn has ended. We swap queues with each other
+                    queueIn.addAll(list);
+                    row = queueIn.poll();
+                }
+            }
         }
-        return map;
+        return row;
     }
 
     @Override
     public void addRow(Map<String, String> row) {
         list.add(row);
+        queueIn.addLast(row);
     }
 
     @Override
-    public <T extends List> List<Map<String, String>> getTable() {
-        return list;
-    }
-
-    @Override
-    public <T extends List> void addTable(List<Map<String, String>> collection) {
-        list = collection;
+    public void addTable(List<Map<String, String>> collection) {
+        list.addAll(collection);
     }
 
     @Override
