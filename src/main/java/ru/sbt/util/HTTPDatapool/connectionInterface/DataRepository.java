@@ -1,20 +1,15 @@
-package ru.sbt.util.HTTPDatapool.repository;
+package ru.sbt.util.HTTPDatapool.connectionInterface;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.stereotype.Repository;
-import ru.sbt.util.HTTPDatapool.connectionInterface.DBConnection;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.*;
-
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 
@@ -34,6 +29,12 @@ public class DataRepository implements DBConnection {
 
     }
 
+    private int getTableSize(String tableName) throws DataAccessException {
+
+        return Integer.parseInt(jdbcTemplate.queryForObject("SELECT COUNT (*) FROM " + tableName, String.class));
+
+    }
+
 
     private List<Map<String, String>> getFromTableBetween(String tableName, int from, int to) throws DataAccessException {
 
@@ -45,9 +46,9 @@ public class DataRepository implements DBConnection {
     }
 
 
-
     @Override
     public List<Map<String, String>> getDataFromCache(String tableName, Set<String> columnNames) {
+
 
         List<Map<String, String>> table = cache.entrySet().stream()
                 .filter(entry -> entry.getKey().equals(tableName))
@@ -62,39 +63,27 @@ public class DataRepository implements DBConnection {
 
     }
 
-    @Override
-    public List<Map<String, String>> getDataFromCacheThreads(String tableName, Set<String> columnNames, int threadCount, int rowsCount, int rowsCountForOneThread) {
-
-
-
-        return null;
-    }
 
     @Override
-    public List<Map<String, String>> getDataFromCacheBetween(String tableName, Set<String> columnNames, int from, int to) {
-
-        if (cache.containsKey(tableName)) {
-            cache.replace(tableName, getDataFromCacheBetween(tableName, columnNames, from, to));
-        } else {
-            cache.put(tableName, getFromTableBetween(tableName, from, to));
-        }
-        List<Map<String, String>> result = cache.get(tableName);
-
-        return result;
-
-    }
-
-    @Override
-    public void clearCache() {
+    public void clearAllCaches() {
 
         cache.clear();
 
     }
 
+    @Override
+    public void clearCache(String tableName) {
+
+    }
+
     private List<Map<String, String>> cachePut(String tableName) {
-        List<Map<String, String>> table = getTable(tableName);
-        cache.put(tableName, table);
-        return table;
+
+
+        Map<String, String>[] table = new Map[getTableSize(tableName)];
+        int size = table.length;
+//        List<Map<String, String>> table = getTable(tableName);
+//        cache.put(tableName, table);
+        return null;
     }
 
     private Map<String, String> filterTableByColumns(Map<String, String> stringStringMap, Set<String> columnNames) {
@@ -112,7 +101,7 @@ public class DataRepository implements DBConnection {
     }
 
     private String castValue(Object value) {
-        if(value!=null){
+        if (value != null) {
             return value.toString();
         }
         return "";
