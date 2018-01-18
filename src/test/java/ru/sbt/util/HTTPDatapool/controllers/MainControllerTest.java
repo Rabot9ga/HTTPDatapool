@@ -51,7 +51,6 @@ public class MainControllerTest extends AbstractTransactionalTestNGSpringContext
                 .build();
 
         mainController = retrofit.create(MainController.class);
-
     }
 
     @Test
@@ -80,6 +79,8 @@ public class MainControllerTest extends AbstractTransactionalTestNGSpringContext
 
         DatapoolRequest request = DatapoolRequest.builder().parametersTables(parametersTables).build();
 //
+        log.info("=======================================================");
+        log.info("=======================================================");
         log.info("Columns Name: {}", columns);
         log.info("TableName: {}", tableName);
         log.info("DataFromCache: {}", dataFromCache);
@@ -91,19 +92,8 @@ public class MainControllerTest extends AbstractTransactionalTestNGSpringContext
         log.info("DatapoolResponse: {}", datapoolResponse);
 
         datapoolResponse.getResponseTables().forEach((parametersTable1, responseTables) -> Assert.assertTrue(dataFromCache.contains(responseTables.getMapParameters())));
-
-
-//        ResponseEntity<String> response = testRestTemplate.postForEntity("/api/getParameter", request, String.class);
-//        String body = response.getBody();
-//
-//        System.out.println("body = " + body);
-
-//        ResponseEntity<DatapoolResponse> response = restTemplate.postForEntity("http://localhost:" + port + "/api/getParameter", entity, DatapoolResponse.class);
-//        ObjectMapper mapper = new ObjectMapper();
-//        DatapoolResponse httpResponseParam = mapper.readValue(body, DatapoolResponse.class);
-//
-//
-//        System.out.println("response = " + httpResponseParam);
+        log.info("=======================================================");
+        log.info("=======================================================");
 
     }
 }
