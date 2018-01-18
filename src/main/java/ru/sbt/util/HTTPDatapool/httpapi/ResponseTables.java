@@ -3,13 +3,13 @@ package ru.sbt.util.HTTPDatapool.httpapi;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Map;
 
 @Data
 @Builder
-public class ResponseTables {
+public class ResponseTables implements Serializable {
 
-    //    UUID token;
     Map<String, String> mapParameters;
     Status status;
     String statusMessage;

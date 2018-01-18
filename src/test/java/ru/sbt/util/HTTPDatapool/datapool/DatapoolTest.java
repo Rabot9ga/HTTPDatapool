@@ -9,7 +9,10 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import ru.sbt.util.HTTPDatapool.connectionInterface.DBConnection;
-import ru.sbt.util.HTTPDatapool.httpapi.*;
+import ru.sbt.util.HTTPDatapool.httpapi.DatapoolRequest;
+import ru.sbt.util.HTTPDatapool.httpapi.DatapoolResponse;
+import ru.sbt.util.HTTPDatapool.httpapi.ParametersTable;
+import ru.sbt.util.HTTPDatapool.httpapi.ResponseTables;
 import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
 import ru.sbt.util.HTTPDatapool.paramsContainer.utils.Generator;
 
@@ -62,11 +65,13 @@ public class DatapoolTest {
                         .columnsName(columns)
                         .tableName("Script" + value)
                         .scriptName("Script" + value)
-                        .type(RequestType.RANDOM).build())
+                        .type(RequestType.RANDOM)
+                        .build())
                 .collect(Collectors.toList());
 
         List<List<Map<String, String>>> parametersFromDB = IntStream.rangeClosed(1, 10)
                 .mapToObj(value -> tableMap.get("Script" + value))
+
                 .collect(Collectors.toList());
 
         Object[][] output = new Object[paramsTable.size()][2];
@@ -97,11 +102,8 @@ public class DatapoolTest {
 
         HashSet<ParametersTable> parametersTables = new HashSet<>();
         parametersTables.add(parametersTable);
-        HTTPRequestParam requestParam = HTTPRequestParam.builder().parametersTables(parametersTables).build();
-        HTTPResponseParam parameters = null;
-//        synchronized (datapool){
-        parameters = datapool.getParameters(requestParam);
-//        }
+        DatapoolRequest datapoolRequest = DatapoolRequest.builder().parametersTables(parametersTables).build();
+        DatapoolResponse parameters = datapool.getParameters(datapoolRequest);
 
         parameters.getResponseTables().forEach((parametersTable1, responseTables) -> assertResponse(responseTables, parametersFromDB));
     }
@@ -116,7 +118,6 @@ public class DatapoolTest {
 
     private void assertResponse(ResponseTables responseTables, List<Map<String, String>> tableData) {
 
-        Assert.assertEquals(responseTables.getStatus(), Status.SUCCESS);
         Assert.assertTrue(tableData.contains(responseTables.getMapParameters()));
     }
 

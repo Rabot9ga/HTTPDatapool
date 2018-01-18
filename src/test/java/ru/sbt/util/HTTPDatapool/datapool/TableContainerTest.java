@@ -2,7 +2,6 @@ package ru.sbt.util.HTTPDatapool.datapool;
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import ru.sbt.util.HTTPDatapool.httpapi.ParametersTable;
 import ru.sbt.util.HTTPDatapool.paramsContainer.DataContainerFactory;
@@ -11,8 +10,6 @@ import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-
-import static org.testng.Assert.*;
 
 public class TableContainerTest {
 

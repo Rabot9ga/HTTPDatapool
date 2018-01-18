@@ -66,4 +66,7 @@ dependencies {
 	testCompileOnly('org.projectlombok:lombok')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('org.testng:testng:6.9.9')
+
+	testCompile ('com.squareup.retrofit2:retrofit:2.3.0')
+	testCompile ('com.squareup.retrofit2:converter-jackson:2.3.0')
 }

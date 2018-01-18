@@ -20,17 +20,21 @@ public class Datapool {
 
     ConcurrentHashMap<ParametersTable, TableContainer> mapContainer = new ConcurrentHashMap<>();
 
-    public HTTPResponseParam getParameters(HTTPRequestParam requestParam) {
+    public DatapoolResponse getParameters(DatapoolRequest datapoolRequest) {
 
-        Map<ParametersTable, ResponseTables> responseMap = requestParam.getParametersTablesStream()
+        Map<ParametersTable, ResponseTables> responseMap = datapoolRequest.getParametersTablesStream()
                 .map(parametersTable -> Pair.of(parametersTable, Optional.ofNullable(mapContainer.get(parametersTable))))
                 .map(pair -> Pair.of(pair.getLeft(), pair.getRight().orElseGet(() -> createTableContainer(pair.getLeft()))))
                 .collect(Collectors.toMap(Pair::getLeft, pair -> buildResponseTable(pair.getRight())));
 
-        return HTTPResponseParam.builder().responseTables(responseMap).build();
+        return DatapoolResponse.builder().responseTables(responseMap).build();
     }
 
+    public void clearCache(){
 
+        mapContainer.clear();
+        dbConnection.clearCache();
+    }
 
     private ResponseTables buildResponseTable(TableContainer tableContainer) {
         return ResponseTables.builder()
