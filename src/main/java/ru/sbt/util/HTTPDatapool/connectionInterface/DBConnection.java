@@ -14,4 +14,6 @@ public interface DBConnection {
 
     void clearCache(String tableName);
 
+    int getCountRowsInCachedTable(String tableName);
+
 }
