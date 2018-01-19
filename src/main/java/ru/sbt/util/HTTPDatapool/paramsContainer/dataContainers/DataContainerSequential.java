@@ -4,23 +4,19 @@ import lombok.extern.slf4j.Slf4j;
 import ru.sbt.util.HTTPDatapool.paramsContainer.api.DataContainerAPI;
 import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
 
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 public class DataContainerSequential extends AbstractDataContainer implements DataContainerAPI {
 
     private Deque<Map<String, String>> queueIn = new ConcurrentLinkedDeque<>();
-    private List<Map<String, String>> list = new CopyOnWriteArrayList<>();
-
-    private AtomicInteger counter = new AtomicInteger();
+    private List<Map<String, String>> list = new ArrayList<>(1_000);
 
     public DataContainerSequential(List<Map<String, String>> collection) {
-        counter.set(0);
         super.requestType = RequestType.SEQUENTIAL;
         if (collection != null) {
             this.addTable(collection);
@@ -31,7 +27,6 @@ public class DataContainerSequential extends AbstractDataContainer implements Da
     public Map<String, String> getRow() {
 
         Map<String, String> row;
-
 
         row = queueIn.poll();
         if (row == null) {
