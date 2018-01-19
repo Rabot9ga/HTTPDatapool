@@ -28,16 +28,13 @@ public class DataRepositoryTest extends AbstractTransactionalTestNGSpringContext
     @Test
     public void getSomeColumnFromTable() {
 
-
-//        HashSet<String> columnNames = new HashSet<>(Arrays.asList("PARTY_ID", "GIVEN_NAME", "MIDDLE_NAME", "FAMILY_NAME"));
         HashSet<String> columnNames = new HashSet<>(Arrays.asList("PARTY_ID"));
         List<Map<String, String>> result = dataRepository.getDataFromCache("FORTEST", columnNames);
-
         assertTrue(result.size() > 0);
 
     }
 
-    @Test
+     @Test
     public void getSomeColumnFromTableThread() {
 
 

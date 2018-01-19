@@ -16,4 +16,6 @@ public interface DBConnection {
 
     int getCountRowsInCachedTable(String tableName);
 
+    double getLoadedPercent(String tableName);
+
 }
