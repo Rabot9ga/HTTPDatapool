@@ -6,15 +6,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.sbt.util.HTTPDatapool.controllers.Utils.Stub;
+import ru.sbt.util.HTTPDatapool.controllers.dto.AddingStatus;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @RestController
@@ -83,11 +82,16 @@ public class FrontEndController {
         int newTableSize = ThreadLocalRandom.current().nextInt(1000);
 
         HashMap<String, String> map = new HashMap<>();
-        map.put("id", String.valueOf(list.size()+1));
+        map.put("id", String.valueOf(list.size() + 1));
         map.put("name", tableName);
         map.put("RowCount", String.valueOf(newTableSize));
+        map.put("status", AddingStatus.UPDATING.name());
+
+//        Stub.tables.add(new StubTable(tableName));
 
         list.add(map);
+
+        Stub.startTimer(map, list, list.indexOf(map));
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.TEXT_PLAIN);
@@ -95,20 +99,13 @@ public class FrontEndController {
         return new ResponseEntity(list, httpHeaders, HttpStatus.OK);
     }
 
-    static class Stub {
-        static AtomicInteger ai = new AtomicInteger();
+    @PostMapping("/getStatus")
+    public ResponseEntity<String> getStatus(@RequestBody String tableName) {
+        log.info("getStatus was executed for table {}", tableName);
 
-        public static List<Map<String, String>> generateList(int count) {
-            return Stream.generate(Stub::generateMap).limit(count).collect(Collectors.toList());
-        }
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.TEXT_PLAIN);
 
-        public static Map<String, String> generateMap() {
-
-            HashMap<String, String> map = new HashMap<>();
-            map.put("id", String.valueOf(ai.getAndIncrement()));
-            map.put("name", UUID.randomUUID().toString().replace("-", "").toUpperCase());
-            map.put("rowCount", String.valueOf(ThreadLocalRandom.current().nextInt(100, 400)));
-            return map;
-        }
+        return new ResponseEntity(Stub.getStatus(list,tableName), httpHeaders, HttpStatus.OK);
     }
 }

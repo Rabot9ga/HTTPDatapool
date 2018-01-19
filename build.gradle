@@ -61,6 +61,7 @@ dependencies {
 	compile ('org.apache.commons:commons-lang3:3.6')
 	runtime('org.springframework.boot:spring-boot-devtools')
 //	runtime('org.postgresql:postgresql')
+	testCompile('org.testng:testng:6.9.9')
 
 	compileOnly('org.projectlombok:lombok')
 	testCompileOnly('org.projectlombok:lombok')

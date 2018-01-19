@@ -1,7 +1,6 @@
 package ru.sbt.util.HTTPDatapool.datapool;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.sbt.util.HTTPDatapool.connectionInterface.DBConnection;
 import ru.sbt.util.HTTPDatapool.httpapi.*;
@@ -15,7 +14,7 @@ import java.util.stream.Collectors;
 @Component
 public class Datapool {
 
-    @Autowired
+//    @Autowired
     DBConnection dbConnection;
 
     ConcurrentHashMap<ParametersTable, TableContainer> mapContainer = new ConcurrentHashMap<>();

@@ -45,12 +45,14 @@
         <div ng-controller="getCacheContent" class="inner-wrapper">
             <span class="h6 mx-3">Поиск:</span>
             <input type="text" ng-model="query" ng-change="search()" class="input-large search-query"/>
+            <a href ng-click="getTables()" class="btn btn-danger">Обновить</a>
             <table class="table table-striped table-condensed table-hover">
                 <thead>
                 <tr>
                     <th class="id" custom-sort order="'id'" sort="sort">Id&nbsp;</th>
                     <th class="name" custom-sort order="'name'" sort="sort">Имя таблицы&nbsp;</th>
                     <th class="rowCount" custom-sort order="'rowCount'" sort="sort">Кол-во строк&nbsp;</th>
+                    <!--<th class="rowCount">Статус</th>-->
                     <th class="clear">Очистить таблицу</th>
                 </tr>
                 </thead>
@@ -99,7 +101,6 @@
                 </tr>
                 </tbody>
             </table>
-            <a href ng-click="search()" class="btn btn-danger">Обновить</a>
         </div>
     </div>
 
