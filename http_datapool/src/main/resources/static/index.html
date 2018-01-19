@@ -12,7 +12,7 @@
     <link href="MDB/css/mdb.min.css" rel="stylesheet">
 
 
-    <link href="js/bootstrap.no-icons.min.css" rel="stylesheet">
+    <link href="css/bootstrap.no-icons.min.css" rel="stylesheet">
 
     <link href="css/style.css" rel="stylesheet">
     <script src="js/angular.min.js"></script>
@@ -52,7 +52,7 @@
                     <th class="id" custom-sort order="'id'" sort="sort">Id&nbsp;</th>
                     <th class="name" custom-sort order="'name'" sort="sort">Имя таблицы&nbsp;</th>
                     <th class="rowCount" custom-sort order="'rowCount'" sort="sort">Кол-во строк&nbsp;</th>
-                    <!--<th class="rowCount">Статус</th>-->
+                    <th class="tableStatus">Статус</th>
                     <th class="clear">Очистить таблицу</th>
                 </tr>
                 </thead>
@@ -87,14 +87,15 @@
                     <td>{{item.id}}</td>
                     <td>{{item.name}}</td>
                     <td>{{item.rowCount}}</td>
+                    <td>{{item.status}}</td>
                     <td>
 
                         <a href ng-click="clickClearTableCache(item.name)" class="btn btn-danger">
-                           <!--data-toggle="confirmation" data-btn-ok-label="Continue" data-btn-ok-icon="glyphicon glyphicon-share-alt"-->
-                                <!--data-btn-ok-class="btn-success"-->
-                                <!--data-btn-cancel-label="Stoooop!" data-btn-cancel-icon="glyphicon glyphicon-ban-circle"-->
-                                <!--data-btn-cancel-class="btn-danger"-->
-                                <!--data-title="Is it ok?" data-content="This might be dangerous">-->
+                            <!--data-toggle="confirmation" data-btn-ok-label="Continue" data-btn-ok-icon="glyphicon glyphicon-share-alt"-->
+                            <!--data-btn-ok-class="btn-success"-->
+                            <!--data-btn-cancel-label="Stoooop!" data-btn-cancel-icon="glyphicon glyphicon-ban-circle"-->
+                            <!--data-btn-cancel-class="btn-danger"-->
+                            <!--data-title="Is it ok?" data-content="This might be dangerous">-->
                             <i class='fa fa-trash' area-hidden="true"></i>
                         </a>
                     </td>

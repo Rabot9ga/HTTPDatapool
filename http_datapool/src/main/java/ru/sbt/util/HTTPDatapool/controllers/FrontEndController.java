@@ -24,7 +24,7 @@ public class FrontEndController {
 //    Datapool datapool;
 
 
-    private List<Map<String, String>> list = Stub.generateList(4);
+    private List<Map<String, String>> list = Stub.generateList(0);
 
     /**
      * Receiving list of tables in cache
