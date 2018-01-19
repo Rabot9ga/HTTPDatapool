@@ -1,14 +1,11 @@
 package ru.sbt.util.HTTPDatapool.paramsContainer;
 
 import ru.sbt.util.HTTPDatapool.paramsContainer.api.DataContainerAPI;
-import ru.sbt.util.HTTPDatapool.paramsContainer.dataContainers.DataContainerSequential;
-import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
 import ru.sbt.util.HTTPDatapool.paramsContainer.dataContainers.DataContainerRandom;
+import ru.sbt.util.HTTPDatapool.paramsContainer.dataContainers.DataContainerSequential;
 import ru.sbt.util.HTTPDatapool.paramsContainer.dataContainers.DataContainerUnique;
+import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
 
-import java.lang.instrument.IllegalClassFormatException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 

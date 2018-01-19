@@ -1,2 +1,4 @@
 rootProject.name = 'HTTPDatapool'
+include 'httpapi'
+include 'http_datapool'
 
