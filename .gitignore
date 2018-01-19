@@ -1,4 +1,4 @@
-gradle.properties
+http_datapool/gradle.properties
 .gradle
 /build/
 !gradle/wrapper/gradle-wrapper.jar
