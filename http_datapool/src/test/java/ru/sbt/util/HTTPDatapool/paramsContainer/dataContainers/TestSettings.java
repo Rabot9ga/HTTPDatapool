@@ -4,7 +4,7 @@ public abstract class TestSettings {
     /**
      * Size of container
      */
-    protected int containerSize = 1000;
+    protected int containerSize = 10000;
     /**
      * Size of container for test addRow
      */

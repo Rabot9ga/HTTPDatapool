@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class DataContainerRandom extends AbstractDataContainer implements DataContainerAPI {
-    private List<Map<String, String>> list = new ArrayList<>(500_000);
+    private List<Map<String, String>> list = new ArrayList<>(5_000);
 
     public DataContainerRandom(List<Map<String, String>> collection) {
         super.requestType = RequestType.RANDOM;

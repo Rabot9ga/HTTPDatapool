@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="HTTPDataPoolFront">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>HTTPDataPool Control Panel</title>
+
+    <!-- Font Awesome -->
+    <link href="MDB/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Bootstrap core CSS -->
+    <link href="MDB/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="MDB/css/mdb.min.css" rel="stylesheet">
+
+
+    <link href="js/bootstrap.no-icons.min.css" rel="stylesheet">
+
+    <link href="css/style.css" rel="stylesheet">
+    <script src="js/angular.min.js"></script>
+    <script src="js/starter.js"></script>
+
+</head>
+<body>
+<h3>Main</h3>
+<!-- Nav tabs -->
+<div class="tabs-wrapper tabs-cyan">
+    <ul class="nav classic-tabs wrapper" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link waves-light active" data-toggle="tab" href="#panel1" role="tab"><i class="fa fa-list"
+                                                                                                  aria-hidden="true"></i>
+                Содержимое кэша</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link waves-light" data-toggle="tab" href="#panel2" role="tab"><i class="fa fa-plus"
+                                                                                           aria-hidden="true"></i>
+                Добавить в кэш</a>
+        </li>
+    </ul>
+</div>
+
+<!-- Tab panels -->
+<div class="tab-content card console ">
+    <div class="tab-pane fade in show active wrapper" id="panel1" role="tabpanel">
+        <h4>Содержимое кэша</h4>
+
+        <div ng-controller="getCacheContent" class="inner-wrapper">
+            <span class="h6 mx-3">Поиск:</span>
+            <input type="text" ng-model="query" ng-change="search()" class="input-large search-query"/>
+            <table class="table table-striped table-condensed table-hover">
+                <thead>
+                <tr>
+                    <th class="id" custom-sort order="'id'" sort="sort">Id&nbsp;</th>
+                    <th class="name" custom-sort order="'name'" sort="sort">Имя таблицы&nbsp;</th>
+                    <th class="rowCount" custom-sort order="'rowCount'" sort="sort">Кол-во строк&nbsp;</th>
+                    <th class="clear">Очистить таблицу</th>
+                </tr>
+                </thead>
+                <tfoot>
+                <td colspan="6">
+                    <div class="pagination pull-right">
+                        <ul>
+                            <li ng-class="{disabled: currentPage == 0}">
+                                <a href ng-click="prevPage()">« Prev</a>
+                            </li>
+
+                            <li ng-repeat="n in range(pagedItems.length, currentPage, currentPage + gap) "
+                                ng-class="{active: n == currentPage}"
+                                ng-click="setPage()">
+                                <a href ng-bind="n + 1">1</a>
+                            </li>
+
+                            <li ng-class="{disabled: (currentPage) == pagedItems.length - 1}">
+                                <a href ng-click="nextPage()">›</a>
+                            </li>
+                            <li ng-class="{disabled: (currentPage) == pagedItems.length - 1}"
+                                ng-show="pagedItems.length > 5" ng-click="setPage(pagedItems.length-1)">
+                                <a href>»</a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </td>
+                </tfoot>
+                <tbody>
+                <tr ng-repeat="item in pagedItems[currentPage] | orderBy:sort.sortingOrder:sort.reverse">
+                    <td>{{item.id}}</td>
+                    <td>{{item.name}}</td>
+                    <td>{{item.rowCount}}</td>
+                    <td>
+
+                        <a href ng-click="clickClearTableCache(item.name)" class="btn btn-danger">
+                           <!--data-toggle="confirmation" data-btn-ok-label="Continue" data-btn-ok-icon="glyphicon glyphicon-share-alt"-->
+                                <!--data-btn-ok-class="btn-success"-->
+                                <!--data-btn-cancel-label="Stoooop!" data-btn-cancel-icon="glyphicon glyphicon-ban-circle"-->
+                                <!--data-btn-cancel-class="btn-danger"-->
+                                <!--data-title="Is it ok?" data-content="This might be dangerous">-->
+                            <i class='fa fa-trash' area-hidden="true"></i>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <a href ng-click="search()" class="btn btn-danger">Обновить</a>
+        </div>
+    </div>
+
+    <div class="tab-pane fade wrapper" id="panel2" role="tabpanel">
+        <h4>Добавить таблицу в кэш</h4>
+
+        <div ng-controller="getCacheContent" class="inner-wrapper">
+            <span class="h6 mx-3">Имя таблицы:</span>
+            <input type="text" class="input-large search-query" ng-model="post.tableToAdd"/>
+            <div>
+                <a href ng-click="addTableCache(post.tableToAdd)" class="btn btn-info waves-effect waves-light" role="button">Добавить</a>
+                <h1>{{post.tableToAdd}}</h1>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<footer>
+    <script type="text/javascript" src="MDB/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="MDB/js/popper.min.js"></script>
+    <script type="text/javascript" src="MDB/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="MDB/js/mdb.js"></script>
+    <!--<script type="text/javascript" src="js/bootstrap-confirmation.min.js"></script>-->
+</footer>
+</body>
+</html>

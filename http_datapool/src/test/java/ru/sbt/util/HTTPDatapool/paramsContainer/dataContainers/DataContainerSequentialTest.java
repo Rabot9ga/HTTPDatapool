@@ -19,31 +19,18 @@ public class DataContainerSequentialTest extends TestData {
     private DataContainerAPI container;
 
     @BeforeClass
-    public void setUp() throws Exception {
+    public void setUp() {
         container = DataContainerFactory.create(RequestType.SEQUENTIAL, list);
     }
 
     @Test
-    public void addTable() throws Exception {
+    public void addTable(){
         Assert.assertEquals(container.getSize(), list.size(), "DataContainerSequential size is " +
                 container.getSize() + " but expected " + list.size());
     }
 
-//    @Test
-//    public void getRowFunctionalTest() throws Exception {
-//
-//        TestResult testResult = TestContainerUtils.gettingTest(container, containerSize);
-//
-//        log.trace("SingleThread getRow test. numOfSequentials/numOfGets - {}/{}", testResult.getNumOfSequentials(), testResult.getNumOfGets());
-//
-//        Assert.assertEquals(testResult.getNumOfSequentials(), testResult.getNumOfGets(), "data doesn't return Sequentially!");
-//        if (containerSize > 1) {
-//            Assert.assertTrue(testResult.getNumOfRepeats() == 0, "Returning is the same all the time!");
-//        }
-//    }
-
     @Test(enabled = false)
-    public void getRow_SingleThrd_Visual() throws Exception {
+    public void getRow_SingleThrd_Visual(){
         for (int i = 0; i < containerSize * 2; i++) {
             Map<String, String> row = container.getRow();
             log.debug("ID: {} Name: {}", row.get("id"), row.get("name"));
@@ -51,7 +38,7 @@ public class DataContainerSequentialTest extends TestData {
     }
 
     @Test
-    public void getSize() throws Exception {
+    public void getSize() {
         DataContainerAPI container = DataContainerFactory.create(RequestType.SEQUENTIAL, list);
         Assert.assertEquals(list.size(), container.getSize(), "DataContainer returns wrong size!");
     }
@@ -68,6 +55,8 @@ public class DataContainerSequentialTest extends TestData {
         DataContainerAPI container = DataContainerFactory.create(RequestType.SEQUENTIAL, list);
 
         TestContainerUtils utils = new TestContainerUtils();
+//        TestResult testResult = TestContainerUtils.gettingTest(utils.concurrentGetRow(container, threadCount, containerSize), threadCount, containerSize);
+
         TestResult testResult = TestContainerUtils.gettingTest(utils.concurrentGetRow(container, threadCount, containerSize), threadCount, containerSize);
 
         Assert.assertEquals(testResult.getNumOfSequentials(), testResult.getNumOfGets(),
@@ -78,12 +67,12 @@ public class DataContainerSequentialTest extends TestData {
     }
 
     @Test
-    public void getRow() throws Exception {
+    public void getRow() {
         Assert.assertTrue(container.getRow().get("id") != null, "getRow() returns null!");
     }
 
     @Test
-    public void addRow() throws Exception {
+    public void addRow() {
         DataContainerAPI container = DataContainerFactory.create(RequestType.SEQUENTIAL, list);
         Assert.assertEquals(container.getSize(), list.size(), "Container size doesn't match size of table used to create it!");
 
@@ -95,7 +84,7 @@ public class DataContainerSequentialTest extends TestData {
     }
 
     @Test
-    public void getRequestType() throws Exception {
+    public void getRequestType() {
         Assert.assertEquals(container.getRequestType(), RequestType.SEQUENTIAL, "DataContainer returns wrong RequestType!");
     }
 
