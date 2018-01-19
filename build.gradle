@@ -1,70 +1,9 @@
-buildscript {
-	ext {
-		springBootVersion = '1.5.9.RELEASE'
-	}
+group = 'ru.sbt.util'
+
+subprojects {
 	repositories {
 		maven {
-			url "http://sbtnexus.ca.sbrf.ru:8081/nexus/content/repositories/jcenter/"
-		}
-		maven {
-			url "http://sbtnexus.ca.sbrf.ru:8081/nexus/content/repositories/central/"
+			url 'http://pprb-oip-tn-4.ca.sbrf.ru:8081/artifactory/atrifactory-gradle-repo'
 		}
 	}
-	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-	}
-}
-
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'org.springframework.boot'
-
-group = 'ru.sbt.util'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = 1.8
-
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'org.springframework.boot'
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-repositories {
-	maven {
-		url "http://sbtnexus.ca.sbrf.ru:8081/nexus/content/repositories/central/"
-	}
-	maven {
-		url "http://sbtnexus.ca.sbrf.ru:8081/nexus/content/repositories/AC_COM_thirdparty/"
-	}
-	maven {
-		url "http://sbtnexus.ca.sbrf.ru:8081/nexus/content/repositories/jcenter/"
-	}
-}
-
-springBoot {
-	executable = true
-	embeddedLaunchScriptProperties =
-			[mode: 'service',
-			 pidFolder: 'pid/',
-			 logFolder: 'log/'
-			]
-
-}
-
-
-dependencies {
-	compile('org.springframework.boot:spring-boot-starter-actuator')
-	compile('org.springframework.boot:spring-boot-starter-jdbc')
-	compile('org.springframework.boot:spring-boot-starter-web')
-	compile ('com.oracle.jdbc:ojdbc7:12.1.0.2')
-	compile ('org.apache.commons:commons-lang3:3.6')
-	runtime('org.springframework.boot:spring-boot-devtools')
-//	runtime('org.postgresql:postgresql')
-	testCompile('org.testng:testng:6.9.9')
-
-	compileOnly('org.projectlombok:lombok')
-	testCompileOnly('org.projectlombok:lombok')
-	testCompile('org.springframework.boot:spring-boot-starter-test')
-	testCompile('org.testng:testng:6.9.9')
 }
