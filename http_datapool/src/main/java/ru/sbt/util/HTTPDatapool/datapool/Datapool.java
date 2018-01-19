@@ -31,9 +31,8 @@ public class Datapool {
     }
 
     public void clearCache(){
-
+// FIXME: 19.01.2018 почистить кеш
         mapContainer.clear();
-        dbConnection.clearCache();
     }
 
     private ResponseTables buildResponseTable(TableContainer tableContainer) {
