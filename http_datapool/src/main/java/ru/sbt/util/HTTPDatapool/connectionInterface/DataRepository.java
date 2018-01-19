@@ -26,6 +26,8 @@ public class DataRepository implements DBConnection {
 
     private  ConcurrentHashMap<String, List<Map<String, String>>> cache = new ConcurrentHashMap<>();
 
+    private ConcurrentHashMap<String,Double> partOfJob= new ConcurrentHashMap<>();
+
     @Value("${countRowsOneSelect:1000}")
     private int countRowsOneSelect;
     @Value("${countThread:100}")
@@ -104,10 +106,18 @@ public class DataRepository implements DBConnection {
             int from = i * countRowsOneSelect + 1;
             int to = (i + 1) * countRowsOneSelect;
             futures.add(service.submit(() -> getFromTableBetween(tableName, from, to)));
-        }
 
+        }
+        int i =1;
         List<Map<String, String>> result = new ArrayList<>();
         for (Future<List<Map<String, String>>> future : futures) {
+            if(partOfJob.containsKey(tableName)){
+                partOfJob.replace(tableName,(double)(i+1)/((double)countRows/(double)(countRowsOneSelect+1)));
+            }
+            else{
+                partOfJob.put(tableName,(double)(i+1)/((double)countRows/(double)(countRowsOneSelect+1)));
+            }
+            log.debug("Table {} loaded by {} percent",tableName,partOfJob.get(tableName)*100);
             try {
                 result.addAll(future.get());
             } catch (InterruptedException e) {
@@ -115,6 +125,7 @@ public class DataRepository implements DBConnection {
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
+            i++;
         }
         cache.put(tableName,result);
         return result;
