@@ -92,6 +92,13 @@ public class DataRepository implements DBConnection {
         return 0;
     }
 
+    @Override
+    public List<String> getAllTableNames() {
+      return partOfJob.entrySet().stream()
+                .map(stringDoubleEntry -> stringDoubleEntry.getKey())
+                .collect(Collectors.toList());
+    }
+
 
     private List<Map<String, String>> cachePut(String tableName) {
 

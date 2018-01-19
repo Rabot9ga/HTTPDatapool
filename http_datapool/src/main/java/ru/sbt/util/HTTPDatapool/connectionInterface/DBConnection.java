@@ -18,4 +18,6 @@ public interface DBConnection {
 
     double getLoadedPercent(String tableName);
 
+    List<String> getAllTableNames();
+
 }
