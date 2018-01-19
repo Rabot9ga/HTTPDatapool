@@ -20,7 +20,7 @@ import ru.sbt.util.HTTPDatapool.controllers.Interfaces.MainController;
 import ru.sbt.util.HTTPDatapool.httpapi.DatapoolRequest;
 import ru.sbt.util.HTTPDatapool.httpapi.DatapoolResponse;
 import ru.sbt.util.HTTPDatapool.httpapi.ParametersTable;
-import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
+import ru.sbt.util.HTTPDatapool.httpapi.RequestType;
 
 import java.io.IOException;
 import java.util.HashSet;

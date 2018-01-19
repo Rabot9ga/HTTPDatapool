@@ -3,8 +3,8 @@ package ru.sbt.util.HTTPDatapool.datapool;
 import lombok.Builder;
 import lombok.Data;
 import ru.sbt.util.HTTPDatapool.httpapi.ParametersTable;
+import ru.sbt.util.HTTPDatapool.httpapi.RequestType;
 import ru.sbt.util.HTTPDatapool.paramsContainer.api.DataContainerAPI;
-import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
 
 import java.util.List;
 import java.util.Map;

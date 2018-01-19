@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.deser.DefaultDeserializationContext;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
 
 import java.util.HashSet;
 

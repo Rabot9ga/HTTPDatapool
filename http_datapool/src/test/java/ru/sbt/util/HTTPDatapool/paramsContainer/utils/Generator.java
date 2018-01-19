@@ -1,9 +1,9 @@
 package ru.sbt.util.HTTPDatapool.paramsContainer.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import ru.sbt.util.HTTPDatapool.httpapi.RequestType;
 import ru.sbt.util.HTTPDatapool.paramsContainer.DataContainerFactory;
 import ru.sbt.util.HTTPDatapool.paramsContainer.api.DataContainerAPI;
-import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
 
 import java.util.ArrayList;
 import java.util.HashMap;

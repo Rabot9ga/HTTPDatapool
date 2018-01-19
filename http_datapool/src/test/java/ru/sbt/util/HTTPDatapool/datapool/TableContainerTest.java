@@ -4,8 +4,8 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import ru.sbt.util.HTTPDatapool.httpapi.ParametersTable;
+import ru.sbt.util.HTTPDatapool.httpapi.RequestType;
 import ru.sbt.util.HTTPDatapool.paramsContainer.DataContainerFactory;
-import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
 
 import java.util.ArrayList;
 import java.util.HashSet;

@@ -1,9 +1,13 @@
 version '0.0.1-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'idea'
 
 sourceCompatibility = 1.8
 
 dependencies {
     testCompile('org.testng:testng:6.9.9')
+    compileOnly('org.projectlombok:lombok:1.16.18')
+    testCompileOnly('org.projectlombok:lombok:1.16.18')
+    compile('com.fasterxml.jackson.core:jackson-databind:2.8.10')
 }

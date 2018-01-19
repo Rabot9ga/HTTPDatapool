@@ -1,4 +1,4 @@
-package ru.sbt.util.HTTPDatapool.paramsContainer.dto;
+package ru.sbt.util.HTTPDatapool.httpapi;
 
 /**
  * Class for choosing type of consuming parameters

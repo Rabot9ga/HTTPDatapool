@@ -3,7 +3,6 @@ package ru.sbt.util.HTTPDatapool.httpapi;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.KeyDeserializer;
-import ru.sbt.util.HTTPDatapool.paramsContainer.dto.RequestType;
 
 import java.io.IOException;
 import java.util.Arrays;
