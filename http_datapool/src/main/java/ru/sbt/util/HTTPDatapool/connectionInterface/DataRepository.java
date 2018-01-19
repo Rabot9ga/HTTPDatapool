@@ -84,6 +84,14 @@ public class DataRepository implements DBConnection {
         }
     }
 
+    @Override
+    public double getLoadedPercent(String tableName) {
+        if (partOfJob.containsKey(tableName)) {
+            return partOfJob.get(tableName);
+        }
+        return 0;
+    }
+
 
     private List<Map<String, String>> cachePut(String tableName) {
 
