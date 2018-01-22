@@ -28,6 +28,17 @@ h4{
 }
 
 /*
+=== Cache content ===
+*/
+
+.fa-check.statusIcon{
+    color:green;
+}
+
+.fa-spinner.statusIcon{
+}
+
+/*
 === Fixing boostrap ===
 */
 .nav > li > a:hover{
@@ -41,8 +52,13 @@ h4{
     transform: scale(1.2,1.2);
 }
 
+.tableStatus{
+    text-align: center !important;
+}
 
-
+.clearTable{
+    text-align: right !important;
+}
 /*
 === Person Window ===
 */

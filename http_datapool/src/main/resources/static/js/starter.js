@@ -1,6 +1,6 @@
 var app = angular.module('HTTPDataPoolFront', []);
 
-app.controller('getCacheContent', function ($scope, $filter, $http) {
+app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
     // init
     $scope.sort = {
         sortingOrder: 'id',
@@ -15,13 +15,12 @@ app.controller('getCacheContent', function ($scope, $filter, $http) {
     $scope.items = [];
 
     $scope.getTables = function () {
-        console.log("getTables executed");
 
         $http.get("/api/frontEnd/getTables")
             .then(function (response) {
-                console.log("getTables: $scope.items b4: " + $scope.items);
+                // console.log("getTables: $scope.items b4: " + $scope.items);
                 $scope.items = response.data;
-                console.log("getTables: $scope.items after: " + $scope.items);
+                // console.log("getTables: $scope.items after: " + $scope.items);
                 // functions have been describe process the data for display
                 $scope.search();
             });
@@ -30,26 +29,67 @@ app.controller('getCacheContent', function ($scope, $filter, $http) {
     $scope.getTables();
 
     /**
+     * Function used to update adding status of specific table
+     *
+     * Returns true if adding Table to cache is done
+     *
+     * @param tableName - name of table which should be
+     */
+    function updateAddingStatus(tableName) {
+        return $http.post("/api/frontEnd/getStatus", tableName)
+            .then(function (response) {
+                console.log("updateAddingStatus: response is ");
+                console.log(response.data.status);
+                if (response.data.status === "READY")
+                    return true;
+                else
+                    return false;
+                // response.data;
+                // console.log("clearTable: $scope.items b4: " + $scope.items);
+                // $scope.getTables();
+            });
+
+    };
+
+
+    // var stop;
+    //
+    // /**
+    //  * Stopping updating table status
+    //  */
+    // $scope.stopUpdatingTableStatus = function () {
+    //     if (angular.isDefined(stop)) {
+    //         $interval.cancel(stop);
+    //         stop = undefined;
+    //     }
+    // };
+    /**
      * Adding table to cache
      * @param name of table to clear
      */
     $scope.addTableCache = function (name) {
-
-
         console.log("Adding tableName: " + name);
-
         $http.post("/api/frontEnd/addTable", name)
             .then(function (response) {
-                // console.log("addTableCache: $scope.items b4: " + $scope.items);
-                $scope.items = response.data;
-                // console.log("addTableCache: $scope.items after: " + $scope.items);
-                // $scope.search();
+                    $scope.items = response.data;
+                    $scope.getTables();
 
-                // console.log("inside then function. Ready to execute getTables");
-                $scope.getTables();
-            });
+                    var stop = $interval(function () {
+                        var isUpdateDone = updateAddingStatus(name);
 
+                        if (isUpdateDone) $interval.cancel(stop);
+
+                        // isUpdateDone.then(function (isUpdateDone) {
+                        //     if (isUpdateDone) $interval.cancel(stop);
+                        // });
+                        // console.log("requeeeesting!");
+                    }, 1000);
+                },
+                function (response) {
+                    alert("ERROR! Table already exists!" + response);
+                });
     }
+
     /**
      * Clearing table cache
      * @param name of table to clear
@@ -62,12 +102,21 @@ app.controller('getCacheContent', function ($scope, $filter, $http) {
                 // console.log("clearTable: $scope.items b4: " + $scope.items);
                 $scope.items = response.data;
                 // console.log("clearTable: $scope.items b4: " + $scope.items);
-                // $scope.search();
-
-
                 $scope.getTables();
             });
+    };
 
+    /**
+     * Function used to disable clearing table while it is being added
+     *
+     * @param status of adding table
+     */
+    $scope.isTableAddingStatus = function (status) {
+        if (status === "UPDATING") {
+            return true;
+        } else {
+            return false;
+        }
     };
 
     var searchMatch = function (haystack, needle) {
@@ -79,7 +128,6 @@ app.controller('getCacheContent', function ($scope, $filter, $http) {
 
     // init the filtered items
     $scope.search = function () {
-
 
 
         $scope.filteredItems = $filter('filter')($scope.items, function (item) {
@@ -96,17 +144,6 @@ app.controller('getCacheContent', function ($scope, $filter, $http) {
         $scope.currentPage = 0;
         // now group by pages
         $scope.groupToPages();
-
-
-        console.log("in search");
-        console.log("$scope.pagedItems:");
-        console.log($scope.pagedItems);
-        console.log("$scope.groupedItems:");
-        console.log($scope.groupedItems);
-        console.log("$scope.filteredItems:");
-        console.log($scope.filteredItems);
-        console.log("$scope.query:");
-        console.log($scope.query);
     };
 
     // calculate page in place
