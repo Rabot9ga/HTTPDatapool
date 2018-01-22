@@ -1,4 +1,4 @@
-http_datapool/gradle.propertiesgit
+gradle.properties
 log/
 http_datapool/log/
 http_datapool/out/

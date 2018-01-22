@@ -1,9 +1,82 @@
-group = 'ru.sbt.util'
+//group = 'ru.sbt.util'
+
+buildscript {
+    repositories {
+        maven {
+            url 'http://pprb-oip-tn-4.ca.sbrf.ru:8081/artifactory/atrifactory-gradle-repo'
+            credentials {
+                username = "${artifactory_user}"
+                password = "${artifactory_password}"
+            }
+        }
+    }
+    dependencies {
+        //Check for the latest version here: http://plugins.gradle.org/plugin/com.jfrog.artifactory
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.6.2"
+    }
+}
 
 subprojects {
-	repositories {
-		maven {
-			url 'http://pprb-oip-tn-4.ca.sbrf.ru:8081/artifactory/atrifactory-gradle-repo'
-		}
-	}
+
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: "com.jfrog.artifactory"
+    apply plugin: 'maven-publish'
+
+    sourceCompatibility = 1.8
+
+    group 'ru.sbt.util'
+
+
+    repositories {
+        maven {
+            url 'http://pprb-oip-tn-4.ca.sbrf.ru:8081/artifactory/atrifactory-gradle-repo'
+        }
+    }
+
+    dependencies {
+        compileOnly('org.projectlombok:lombok:1.16.18')
+
+        testCompileOnly('org.projectlombok:lombok:1.16.18')
+        testCompile('org.testng:testng:6.9.9')
+    }
+
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+            }
+        }
+    }
+
+    artifactory {
+        contextUrl = "${artifactory_contextUrl}"
+        //The base Artifactory URL if not overridden by the publisher/resolver
+
+        publish {
+            repository {
+                repoKey = 'ontar-repo'
+                username = "${artifactory_user}"
+                password = "${artifactory_password}"
+                maven = true
+
+            }
+            defaults {
+                publications('mavenJava')
+                publishArtifacts = true
+                publishPom = true
+            }
+        }
+        resolve {
+            repository {
+                repoKey = 'atrifactory-gradle-repo'
+                username = "${artifactory_user}"
+                password = "${artifactory_password}"
+                maven = true
+
+            }
+        }
+    }
 }
