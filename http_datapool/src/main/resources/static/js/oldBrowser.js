@@ -179,10 +179,6 @@
             // Assume supported, and just return false for browser versions
             // that we definitely have no interest in supporting.
 
-
-            console.log(userAgent.browser_name);
-            console.log(userAgent.browser_version);
-
             if (userAgent.browser_name == 'ie' && userAgent.browser_version.substring(0,2) < 12 ) {
                 return false;
             }
@@ -200,10 +196,10 @@
                 if (jQuery('.old-browser-banner').length > 0) return;
                 var $browserBanner = jQuery('<div class="old-browser-banner">');
                 $browserBanner.html('Вы используете старую версию браузера! (' + userAgent.browser_name + ' ' + userAgent.browser_version +') ' +
-                    '<br> <a href="\\\\sbt-ontib-001\\Shared\\Distrib\\ActualBrowsers\\" target="_blank">Обновите</a> до актуальной версии!');
+                    '<br> <a href="\\\\10.68.195.116\\Shared\\Distrib\\ActualBrowsers" target="_explorer.exe">Обновите</a> до актуальной версии!');
                 jQuery(document.body).prepend($browserBanner);
                 $browserBanner.animate({
-                    'padding-top': "+=50px"
+                    'padding-top': "+=20px"
                 }, 1000)
             }
         }
