@@ -18,7 +18,6 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
 
         $http.get("/api/frontEnd/getTables")
             .then(function (response) {
-                console.log("/api/frontEnd/getTables requested")
                 $scope.items = response.data;
                 $scope.search();
             });
@@ -36,8 +35,6 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
     function updateAddingStatus(tableName) {
         return $http.post("/api/frontEnd/getStatus", tableName)
             .then(function (response) {
-                console.log("updateAddingStatus: response is ");
-                console.log(response.data.status);
                 if (response.data.status === "READY")
                     return true;
                 else
@@ -51,7 +48,7 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
      * @param name of table to clear
      */
     $scope.addTableCache = function (name) {
-        console.log("Adding tableName: " + name);
+        $scope.post.tableToAdd = null;
         $http.post("/api/frontEnd/addTable", name)
             .then(function (response) {
                     $scope.items = response.data;
@@ -61,12 +58,52 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
                         var isUpdateDone = updateAddingStatus(name);
                         if (isUpdateDone) $interval.cancel(stop);
                     }, 1000);
-                    alert("SUCCESS");
+                    $.confirm({
+                        icon: 'fa fa-spinner fa-spin',
+                        title: 'Мы работаем над этим..',
+                        content: "Запрос на добавление таблицы в кэш отправлен, но её появление в интерфейсе может произойти не сразу",
+                        buttons: {
+                            gotIt: {
+                                text: 'Я понял',
+                            }
+                        }
+                    });
                 },
-                function (response) {
-                    // $.alert("ERROR! Table already exists!");
-                    alert("ERROR! Table already exists!");
+                function () {
+                    $.confirm({
+                        title: "Ошибка!",
+                        content: "Таблица уже существует!",
+                        type: 'red',
+                        typeAnimated: true,
+                        buttons: {
+                            close: function () {
+                            }
+                        }
+                    });
                 });
+    }
+
+
+    $scope.confirmClearTableCache = function (name) {
+        $.confirm({
+            title: "Вы уверены?",
+            content: "Содержимое таблицы кэша пропадет в недрах истории!",
+            type: 'red',
+            typeAnimated: true,
+            escapeKey: true,
+            buttons: {
+                tryDelete: {
+                    text: 'Удаляем!',
+                    btnClass: 'btn-red',
+                    action: function () {
+                        $scope.clickClearTableCache(name);
+                    }
+                },
+                close: function () {
+                    $.alert('Не шути с удалением!')
+                }
+            }
+        });
     }
 
     /**
@@ -75,6 +112,8 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
      */
     $scope.clickClearTableCache = function (name) {
         console.log("Clearing table: " + name);
+
+        // $.confirm("123");
 
         $http.post("/api/frontEnd/clearTable", name)
             .then(function (response) {
