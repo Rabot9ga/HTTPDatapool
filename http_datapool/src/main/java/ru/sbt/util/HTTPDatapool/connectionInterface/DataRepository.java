@@ -68,12 +68,14 @@ public class DataRepository implements DBConnection {
     public void clearAllCaches() {
 
         cache.clear();
+        partOfJob.clear();
 
     }
 
     @Override
     public void clearCache(String tableName) {
         cache.remove(tableName);
+        partOfJob.remove(tableName);
     }
 
     @Override
