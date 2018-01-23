@@ -1,5 +1,6 @@
 package ru.sbt.util.HTTPDatapool.datapool;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -7,12 +8,14 @@ import ru.sbt.util.HTTPDatapool.connectionInterface.DBConnection;
 import ru.sbt.util.HTTPDatapool.httpapi.*;
 import ru.sbt.util.HTTPDatapool.paramsContainer.DataContainerFactory;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public class Datapool {
 
     @Autowired
@@ -30,9 +33,15 @@ public class Datapool {
         return DatapoolResponse.builder().responseTables(responseMap).build();
     }
 
-    public void clearCache(){
-// FIXME: 19.01.2018 почистить кеш
-        mapContainer.clear();
+    public void clearCache(String tableName){
+        log.info("Remove keys from datapool with name: {}", tableName);
+        ParametersTable parameters;
+        List<ParametersTable> keyToDelete = mapContainer.keySet().stream()
+                .filter(parametersTable -> parametersTable.getTableName().equals(tableName))
+                .collect(Collectors.toList());
+        log.info("Keys to remove count: {}", keyToDelete.size());
+        log.debug("Keys to remove: {}", keyToDelete);
+        keyToDelete.forEach(parametersTable -> mapContainer.remove(parametersTable));
     }
 
     private ResponseTables buildResponseTable(TableContainer tableContainer) {

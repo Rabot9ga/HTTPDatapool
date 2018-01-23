@@ -1,5 +1,6 @@
 package ru.sbt.util.HTTPDatapool.controllers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +13,7 @@ import ru.sbt.util.HTTPDatapool.httpapi.DatapoolResponse;
 
 @RestController
 @RequestMapping("/api")
+@Slf4j
 public class MainController {
 
     @Autowired
@@ -20,9 +22,11 @@ public class MainController {
 
     @PostMapping(value = "/getParameter")
     public ResponseEntity<DatapoolResponse> getParameter(@RequestBody DatapoolRequest datapoolRequest) {
+        log.debug("Call /api/getParameter: {}", datapoolRequest);
 
         DatapoolResponse parameters = datapool.getParameters(datapoolRequest);
 
+        log.debug("return parameters: {}", parameters);
         return ResponseEntity.ok(parameters);
     }
 }
