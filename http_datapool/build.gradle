@@ -1,29 +1,3 @@
-buildscript {
-    ext {
-        springBootVersion = '1.5.9.RELEASE'
-    }
-    repositories {
-        maven {
-            url 'http://pprb-oip-tn-4.ca.sbrf.ru:8081/artifactory/atrifactory-gradle-repo'
-            credentials {
-                username = "${artifactory_user}"
-                password = "${artifactory_password}"
-            }
-        }
-        maven {
-			url "http://sbtnexus.ca.sbrf.ru:8081/nexus/content/repositories/jcenter/"
-		}
-		maven {
-			url "http://sbtnexus.ca.sbrf.ru:8081/nexus/content/repositories/central/"
-		}
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-    }
-}
-
-apply plugin: 'org.springframework.boot'
-
 version = '0.0.1-SNAPSHOT'
 
 repositories {
@@ -44,6 +18,10 @@ repositories {
     maven {
         url "http://sbtnexus.ca.sbrf.ru:8081/nexus/content/repositories/jcenter/"
     }
+}
+
+artifactoryPublish {
+    dependsOn bootRepackage
 }
 
 springBoot {

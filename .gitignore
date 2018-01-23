@@ -1,4 +1,3 @@
-gradle.properties
 log/
 http_datapool/log/
 http_datapool/out/
@@ -29,3 +28,4 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+/gradle.properties
