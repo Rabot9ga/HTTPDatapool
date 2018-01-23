@@ -1,19 +1,17 @@
 package ru.sbt.util.HTTPDatapool.controllers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.sbt.util.HTTPDatapool.controllers.Utils.Stub;
-import ru.sbt.util.HTTPDatapool.controllers.dto.AddingStatus;
+import ru.sbt.util.HTTPDatapool.connectionInterface.DataRepository;
 import ru.sbt.util.HTTPDatapool.controllers.dto.StatusContainer;
+import ru.sbt.util.HTTPDatapool.datapool.Datapool;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
@@ -21,11 +19,23 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequestMapping("/api/frontEnd/")
 public class FrontEndController {
 
-//    @Autowired
-//    Datapool datapool;
+    @Autowired
+    DataRepository dataRepository;
+
+    @Autowired
+    Datapool datapool;
+
+    ExecutorService service = Executors.newFixedThreadPool(3);
+
+//    {
+//        HashSet<String> columnNames = new HashSet<>(Arrays.asList("*"));
+//        List<Map<String, String>> result = dataRepository.getDataFromCache("FORTEST", columnNames);
+//    }
 
 
-    private List<Map<String, String>> list = Stub.generateList(3);
+    //    private List<Map<String, String>> list = Stub.generateList(3);
+//    private List<Map<String, String>> list = dataRepository.getAllInfoAboutTablesInCache();
+    private List<Map<String, String>> list = new ArrayList<>();
 
     /**
      * Receiving list of tables in cache
@@ -35,13 +45,11 @@ public class FrontEndController {
     @GetMapping("/getTables")
     public ResponseEntity<List<Map<String, String>>> getTables() {
 
-        log.info("getTables was executed!");
-        log.info("list is {}", list);
+        list = dataRepository.getAllInfoAboutTablesInCache();
+        log.info("getTables was executed! list is {}", list);
 
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.TEXT_PLAIN);
 
-        return new ResponseEntity(list, httpHeaders, HttpStatus.OK);
+        return ResponseEntity.ok(list);
     }
 
     /**
@@ -63,20 +71,18 @@ public class FrontEndController {
             }
         });
 
-        list.remove(indexToDelete.get());
+        dataRepository.clearCache(tableName);
+        datapool.clearCache(tableName);
 
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.TEXT_PLAIN);
+        list = dataRepository.getAllInfoAboutTablesInCache();
+//        list.remove(indexToDelete.get());
 
-        return new ResponseEntity(list, httpHeaders, HttpStatus.OK);
+        return ResponseEntity.ok(list);
     }
 
     @PostMapping("/addTable")
     public ResponseEntity<List<Map<String, String>>> addTable(@RequestBody String tableName) {
-        log.info("addTable was executed for table {}", tableName);
-
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.TEXT_PLAIN);
+        log.debug("addTable was executed for table {}", tableName);
 
         /*
             1) Looking for existing tables with the same name
@@ -90,36 +96,40 @@ public class FrontEndController {
 
         if (tableExists) {
             log.error("trying to save existing table with name {}", tableName);
-            return new ResponseEntity("Table exists", httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity("Table already exists", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        int newTableSize = ThreadLocalRandom.current().nextInt(1000);
-        HashMap<String, String> map = new HashMap<>();
-        map.put("id", String.valueOf(list.size() + 1));
-        map.put("name", tableName);
-        map.put("rowCount", String.valueOf(newTableSize));
-        map.put("status", AddingStatus.UPDATING.name());
-        map.put("progress", "0.0");
+//        int newTableSize = ThreadLocalRandom.current().nextInt(1000);
+//        HashMap<String, String> map = new HashMap<>();
+//        map.put("id", String.valueOf(list.size() + 1));
+//        map.put("name", tableName);
+//        map.put("rowCount", String.valueOf(newTableSize));
+//        map.put("status", AddingStatus.UPDATING.name());
+//        map.put("progress", "0.0");
+//        list.add(map);
+//        Stub.startTimer(map, list, list.indexOf(map));
 
-        list.add(map);
+        service.submit(() -> dataRepository.getDataFromCache(tableName, new HashSet<>(Collections.singletonList("*"))));
 
-        Stub.startTimer(map, list, list.indexOf(map));
+        list = dataRepository.getAllInfoAboutTablesInCache();
 
-
-        return new ResponseEntity(list, httpHeaders, HttpStatus.OK);
+        return ResponseEntity.ok(list);
     }
 
     @PostMapping("/getStatus")
     public ResponseEntity<StatusContainer> getStatus(@RequestBody String tableName) {
-        log.info("getStatus was executed for table {}", tableName);
+//        StatusContainer status = Stub.getStatus(list, tableName);
+        StatusContainer status;
 
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.TEXT_PLAIN);
+        double loadedPercent = dataRepository.getLoadedPercent(tableName);
 
-        StatusContainer status = Stub.getStatus(list, tableName);
+        if (loadedPercent == 100) {
+            status = new StatusContainer("READY", Double.toString(loadedPercent));
+        } else {
+            status = new StatusContainer("UPDATING", Double.toString(loadedPercent));
+        }
 
-        log.info("Status is {}, percent is {}", status.getStatus(), status.getPercent());
-
-        return new ResponseEntity(status, httpHeaders, HttpStatus.OK);
+        log.debug("getStatus was executed for table {}. Status is {}, percent is {}", tableName, status.getStatus(), status.getPercent());
+        return ResponseEntity.ok(status);
     }
 }

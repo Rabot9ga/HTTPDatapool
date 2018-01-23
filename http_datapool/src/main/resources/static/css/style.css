@@ -176,3 +176,14 @@ h4{
 .tab-content{
     padding:20px 10px;
 }
+
+/*
+=== Tabs ===
+*/
+.old-browser-banner {
+    padding: 0px 30px 30px;
+    background-color: red;
+    text-align: center;
+    line-height: 30px;
+    font-size: 21px;
+}

@@ -9,7 +9,7 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
     $scope.gap = 5;
     $scope.filteredItems = [];
     $scope.groupedItems = [];
-    $scope.itemsPerPage = 5;
+    $scope.itemsPerPage = 150;
     $scope.pagedItems = [];
     $scope.currentPage = 0;
     $scope.items = [];
@@ -18,10 +18,8 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
 
         $http.get("/api/frontEnd/getTables")
             .then(function (response) {
-                // console.log("getTables: $scope.items b4: " + $scope.items);
+                console.log("/api/frontEnd/getTables requested")
                 $scope.items = response.data;
-                // console.log("getTables: $scope.items after: " + $scope.items);
-                // functions have been describe process the data for display
                 $scope.search();
             });
     };
@@ -44,25 +42,10 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
                     return true;
                 else
                     return false;
-                // response.data;
-                // console.log("clearTable: $scope.items b4: " + $scope.items);
-                // $scope.getTables();
             });
 
     };
 
-
-    // var stop;
-    //
-    // /**
-    //  * Stopping updating table status
-    //  */
-    // $scope.stopUpdatingTableStatus = function () {
-    //     if (angular.isDefined(stop)) {
-    //         $interval.cancel(stop);
-    //         stop = undefined;
-    //     }
-    // };
     /**
      * Adding table to cache
      * @param name of table to clear
@@ -76,17 +59,13 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
 
                     var stop = $interval(function () {
                         var isUpdateDone = updateAddingStatus(name);
-
                         if (isUpdateDone) $interval.cancel(stop);
-
-                        // isUpdateDone.then(function (isUpdateDone) {
-                        //     if (isUpdateDone) $interval.cancel(stop);
-                        // });
-                        // console.log("requeeeesting!");
                     }, 1000);
+                    alert("SUCCESS");
                 },
                 function (response) {
-                    alert("ERROR! Table already exists!" + response);
+                    // $.alert("ERROR! Table already exists!");
+                    alert("ERROR! Table already exists!");
                 });
     }
 
@@ -99,9 +78,7 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
 
         $http.post("/api/frontEnd/clearTable", name)
             .then(function (response) {
-                // console.log("clearTable: $scope.items b4: " + $scope.items);
                 $scope.items = response.data;
-                // console.log("clearTable: $scope.items b4: " + $scope.items);
                 $scope.getTables();
             });
     };
@@ -118,6 +95,23 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
             return false;
         }
     };
+
+    /**
+     * Auto refreshing table with caches
+     */
+    $scope.enableAutoRefreshTable = function () {
+        var stop = $interval(function () {
+            console.log("inside");
+            if (!$scope.enableAutoRefreshTableCheckbox) {
+                console.log("disabling");
+                $interval.cancel(stop);
+            } else {
+                console.log("requesting");
+                $scope.getTables();
+            }
+        }, 1000);
+    };
+
 
     var searchMatch = function (haystack, needle) {
         if (!needle) {
