@@ -54,6 +54,10 @@ public class DataRepository implements DBConnection {
                 .findAny()
                 .orElseGet(() -> cachePut(tableName));
 
+        if(columnNames.contains("*")){
+            return table;
+        }
+
         return table.stream()
                 .map(stringStringMap -> filterTableByColumns(stringStringMap, columnNames))
                 .collect(Collectors.toList());
