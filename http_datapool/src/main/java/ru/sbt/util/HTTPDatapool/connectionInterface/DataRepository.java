@@ -14,18 +14,13 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
-
 @Repository
 @Slf4j
 public class DataRepository implements DBConnection {
-
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
     private ConcurrentHashMap<String, List<Map<String, String>>> cache = new ConcurrentHashMap<>();
-
     private ConcurrentHashMap<String, Double> partOfJob = new ConcurrentHashMap<>();
-
     @Value("${countRowsOneSelect:1000}")
     private int countRowsOneSelect;
     @Value("${countThread:100}")
@@ -35,16 +30,13 @@ public class DataRepository implements DBConnection {
         return Integer.parseInt(jdbcTemplate.queryForObject("SELECT COUNT (*) FROM " + tableName, String.class));
     }
 
-
     private List<Map<String, String>> getFromTableBetween(String tableName, int from, int to) throws DataAccessException {
-
         String query = "SELECT * FROM (SELECT ROWNUM NUM, A.* FROM " + tableName + " A) B ";
         query += "WHERE B.NUM BETWEEN " + from + " and " + to;
         return jdbcTemplate.queryForList(query).stream()
                 .map(this::castMapValue)
                 .collect(Collectors.toList());
     }
-
 
     @Override
     public List<Map<String, String>> getDataFromCache(String tableName, Set<String> columnNames) {
@@ -53,23 +45,18 @@ public class DataRepository implements DBConnection {
                 .map(Map.Entry::getValue)
                 .findAny()
                 .orElseGet(() -> cachePut(tableName));
-
         if (columnNames.contains("*")) {
             return table;
         }
-
         return table.stream()
                 .map(stringStringMap -> filterTableByColumns(stringStringMap, columnNames))
                 .collect(Collectors.toList());
     }
 
-
     @Override
     public void clearAllCaches() {
-
         cache.clear();
         partOfJob.clear();
-
     }
 
     @Override
@@ -111,7 +98,9 @@ public class DataRepository implements DBConnection {
             tableInfo.put("name", stringListEntry.getKey());
             if (cache.get(stringListEntry.getKey()) != null) {
                 tableInfo.put("rowCount", String.valueOf(cache.get(stringListEntry.getKey()).size()));
-            } else { tableInfo.put("rowCount","no information");}
+            } else {
+                tableInfo.put("rowCount", "no information");
+            }
             tableInfo.put("progress", String.valueOf(aDouble * 100));
             if (aDouble != 1) {
                 tableInfo.put("status", AddingStatus.UPDATING.name());
@@ -125,19 +114,15 @@ public class DataRepository implements DBConnection {
 
 
     private List<Map<String, String>> cachePut(String tableName) {
-
         log.info("countRowsOneSelect: {}", countRowsOneSelect);
         log.info("countThread: {}", countThread);
-
-
+        if (partOfJob.putIfAbsent(tableName, 0d) != null) {
+            return null;
+        }
         CustomizableThreadFactory selectThread = new CustomizableThreadFactory("selectThread");
         int countRows = getTableSize(tableName);
         log.info("countRows: {}", countRows);
-
-
         ExecutorService service = Executors.newFixedThreadPool(countThread, selectThread);
-
-
         List<Future<List<Map<String, String>>>> futures = new ArrayList<>();
         for (int i = 0; i < countRows / countRowsOneSelect + 1; i++) {
             int from = i * countRowsOneSelect + 1;
@@ -155,11 +140,7 @@ public class DataRepository implements DBConnection {
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
-            if (partOfJob.containsKey(tableName)) {
-                partOfJob.replace(tableName, (double) (i + 1) / ((double) futures.size()));
-            } else {
-                partOfJob.put(tableName, (double) (i + 1) / ((double) futures.size()));
-            }
+            partOfJob.replace(tableName, (double) (i + 1) / ((double) futures.size()));
             log.info("Table {} loaded by {} percent", tableName, partOfJob.get(tableName) * 100);
             i++;
         }
@@ -173,9 +154,7 @@ public class DataRepository implements DBConnection {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-
     private Map<String, String> castMapValue(Map<String, Object> map) {
-
         return map.entrySet().stream()
                 .map(entry -> ImmutablePair.of(entry.getKey(), castValue(entry.getValue())))
                 .collect(Collectors.toMap(o -> o.left, o -> o.right));
