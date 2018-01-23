@@ -10,6 +10,7 @@ import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.stereotype.Repository;
 import ru.sbt.util.HTTPDatapool.controllers.dto.AddingStatus;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -25,6 +26,16 @@ public class DataRepository implements DBConnection {
     private int countRowsOneSelect;
     @Value("${countThread:100}")
     private int countThread;
+
+    private CustomizableThreadFactory selectThread;
+    private ExecutorService service;
+
+    @PostConstruct
+    private void init(){
+         selectThread = new CustomizableThreadFactory("selectThread");
+        service = Executors.newFixedThreadPool(countThread, selectThread);
+    }
+
 
     private int getTableSize(String tableName) throws DataAccessException {
         return Integer.parseInt(jdbcTemplate.queryForObject("SELECT COUNT (*) FROM " + tableName, String.class));
@@ -119,10 +130,10 @@ public class DataRepository implements DBConnection {
         if (partOfJob.putIfAbsent(tableName, 0d) != null) {
             return null;
         }
-        CustomizableThreadFactory selectThread = new CustomizableThreadFactory("selectThread");
+
         int countRows = getTableSize(tableName);
         log.info("countRows: {}", countRows);
-        ExecutorService service = Executors.newFixedThreadPool(countThread, selectThread);
+
         List<Future<List<Map<String, String>>>> futures = new ArrayList<>();
         for (int i = 0; i < countRows / countRowsOneSelect + 1; i++) {
             int from = i * countRowsOneSelect + 1;
