@@ -54,7 +54,7 @@ public class DataRepository implements DBConnection {
                 .findAny()
                 .orElseGet(() -> cachePut(tableName));
 
-        if(columnNames.contains("*")){
+        if (columnNames.contains("*")) {
             return table;
         }
 
@@ -103,11 +103,13 @@ public class DataRepository implements DBConnection {
     @Override
     public List<Map<String, String>> getAllInfoAboutTablesInCache() {
         List<Map<String, String>> listInfo = new ArrayList<>();
-        for (Map.Entry<String, List<Map<String, String>>> stringListEntry : cache.entrySet()) {
+        for (Map.Entry<String, Double> stringListEntry : partOfJob.entrySet()) {
             Map<String, String> tableInfo = new HashMap<>();
             Double aDouble = partOfJob.get(stringListEntry.getKey());
             tableInfo.put("name", stringListEntry.getKey());
-            tableInfo.put("rowCount", String.valueOf(stringListEntry.getValue().size()));
+            if (cache.get(stringListEntry.getKey()) != null) {
+                tableInfo.put("rowCount", String.valueOf(cache.get(stringListEntry.getKey()).size()));
+            } else { tableInfo.put("rowCount","no information");}
             tableInfo.put("progress", String.valueOf(aDouble * 100));
             if (aDouble != 1) {
                 tableInfo.put("status", AddingStatus.UPDATING.name());
