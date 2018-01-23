@@ -8,11 +8,9 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.stereotype.Repository;
+import ru.sbt.util.HTTPDatapool.controllers.dto.AddingStatus;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
@@ -24,9 +22,9 @@ public class DataRepository implements DBConnection {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    private  ConcurrentHashMap<String, List<Map<String, String>>> cache = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, List<Map<String, String>>> cache = new ConcurrentHashMap<>();
 
-    private ConcurrentHashMap<String,Double> partOfJob= new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, Double> partOfJob = new ConcurrentHashMap<>();
 
     @Value("${countRowsOneSelect:1000}")
     private int countRowsOneSelect;
@@ -56,6 +54,10 @@ public class DataRepository implements DBConnection {
                 .findAny()
                 .orElseGet(() -> cachePut(tableName));
 
+        if(columnNames.contains("*")){
+            return table;
+        }
+
         return table.stream()
                 .map(stringStringMap -> filterTableByColumns(stringStringMap, columnNames))
                 .collect(Collectors.toList());
@@ -78,8 +80,7 @@ public class DataRepository implements DBConnection {
     public int getCountRowsInCachedTable(String tableName) {
         if (cache.containsKey(tableName)) {
             return cache.get(tableName).size();
-        }
-        else {
+        } else {
             return -1;
         }
     }
@@ -94,35 +95,52 @@ public class DataRepository implements DBConnection {
 
     @Override
     public List<String> getAllTableNames() {
-      return partOfJob.entrySet().stream()
+        return partOfJob.entrySet().stream()
                 .map(stringDoubleEntry -> stringDoubleEntry.getKey())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Map<String, String>> getAllInfoAboutTablesInCache() {
+        List<Map<String, String>> listInfo = new ArrayList<>();
+        for (Map.Entry<String, List<Map<String, String>>> stringListEntry : cache.entrySet()) {
+            Map<String, String> tableInfo = new HashMap<>();
+            Double aDouble = partOfJob.get(stringListEntry.getKey());
+            tableInfo.put("name", stringListEntry.getKey());
+            tableInfo.put("rowCount", String.valueOf(stringListEntry.getValue().size()));
+            tableInfo.put("progress", String.valueOf(aDouble * 100));
+            if (aDouble != 1) {
+                tableInfo.put("status", AddingStatus.UPDATING.name());
+            } else {
+                tableInfo.put("status", AddingStatus.READY.name());
+            }
+            listInfo.add(tableInfo);
+        }
+        return listInfo;
     }
 
 
     private List<Map<String, String>> cachePut(String tableName) {
 
-        log.info("countRowsOneSelect: {}",countRowsOneSelect);
-        log.info("countThread: {}",countThread);
-
+        log.info("countRowsOneSelect: {}", countRowsOneSelect);
+        log.info("countThread: {}", countThread);
 
 
         CustomizableThreadFactory selectThread = new CustomizableThreadFactory("selectThread");
         int countRows = getTableSize(tableName);
-        log.info("countRows: {}",countRows);
-
+        log.info("countRows: {}", countRows);
 
 
         ExecutorService service = Executors.newFixedThreadPool(countThread, selectThread);
 
 
         List<Future<List<Map<String, String>>>> futures = new ArrayList<>();
-        for (int i = 0; i < countRows / countRowsOneSelect +1; i++) {
+        for (int i = 0; i < countRows / countRowsOneSelect + 1; i++) {
             int from = i * countRowsOneSelect + 1;
             int to = (i + 1) * countRowsOneSelect;
             futures.add(service.submit(() -> getFromTableBetween(tableName, from, to)));
         }
-        int i =0;
+        int i = 0;
         List<Map<String, String>> result = new ArrayList<>();
         for (Future<List<Map<String, String>>> future : futures) {
 
@@ -133,16 +151,15 @@ public class DataRepository implements DBConnection {
             } catch (ExecutionException e) {
                 e.printStackTrace();
             }
-            if(partOfJob.containsKey(tableName)){
-                partOfJob.replace(tableName,(double)(i+1)/((double)futures.size()));
+            if (partOfJob.containsKey(tableName)) {
+                partOfJob.replace(tableName, (double) (i + 1) / ((double) futures.size()));
+            } else {
+                partOfJob.put(tableName, (double) (i + 1) / ((double) futures.size()));
             }
-            else{
-                partOfJob.put(tableName,(double)(i+1)/((double)futures.size()));
-            }
-            log.info("Table {} loaded by {} percent",tableName,partOfJob.get(tableName)*100);
+            log.info("Table {} loaded by {} percent", tableName, partOfJob.get(tableName) * 100);
             i++;
         }
-        cache.put(tableName,result);
+        cache.put(tableName, result);
         return result;
     }
 

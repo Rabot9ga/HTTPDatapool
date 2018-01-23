@@ -4,9 +4,12 @@ package ru.sbt.util.HTTPDatapool;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
+import org.springframework.transaction.annotation.Transactional;
 import org.testng.annotations.Test;
 import ru.sbt.util.HTTPDatapool.connectionInterface.DataRepository;
+import ru.sbt.util.HTTPDatapool.httpapi.ParametersTable;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -18,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 @SpringBootTest
 @Slf4j
+
 public class DataRepositoryTest extends AbstractTransactionalTestNGSpringContextTests {
 
 
@@ -28,7 +32,7 @@ public class DataRepositoryTest extends AbstractTransactionalTestNGSpringContext
     @Test
     public void getSomeColumnFromTable() {
 
-        HashSet<String> columnNames = new HashSet<>(Arrays.asList("PARTY_ID"));
+        HashSet<String> columnNames = new HashSet<>(Arrays.asList("*"));
         List<Map<String, String>> result = dataRepository.getDataFromCache("FORTEST", columnNames);
         assertTrue(result.size() > 0);
 
@@ -52,9 +56,16 @@ public class DataRepositoryTest extends AbstractTransactionalTestNGSpringContext
         log.info("Request from cache time: {} miliseconds", ((System.currentTimeMillis() - start)));
         log.info("========================================================");
 
-        assertTrue(result.size() == dataRepository.getCountRowsInCachedTable("TEST_TABLE"));
+         HashSet<String> columnNames1 = new HashSet<>(Arrays.asList("PARTY_ID"));
+         List<Map<String, String>> result1 = dataRepository.getDataFromCache("FORTEST", columnNames1);
 
+         List<Map<String, String>> allInfoAboutTablesInCache = dataRepository.getAllInfoAboutTablesInCache();
+
+         assertTrue(result.size() == dataRepository.getCountRowsInCachedTable("TEST_TABLE"));
+    
 
     }
+
+
 
 }
