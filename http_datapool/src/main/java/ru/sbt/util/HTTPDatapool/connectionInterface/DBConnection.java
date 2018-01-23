@@ -20,4 +20,6 @@ public interface DBConnection {
 
     List<String> getAllTableNames();
 
+    List<Map<String,String>> getAllInfoAboutTablesInCache();
+
 }
