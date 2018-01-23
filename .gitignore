@@ -29,3 +29,12 @@ dist/
 nbdist/
 .nb-gradle/
 /gradle.properties
+http_datapool/src/main/java/ru/sbt/util/HTTPDatapool/repository/
+http_datapool/src/main/resources/templates/
+http_datapool/src/test/resources/
+http_parameter/out/
+http_parameter/src/main/resources/
+http_parameter/src/test/resources/
+httpapi/out/
+httpapi/src/main/resources/
+httpapi/src/test/resources/

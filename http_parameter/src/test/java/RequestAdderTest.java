@@ -6,7 +6,7 @@
 //import retrofit2.Callback;
 //import retrofit2.Response;
 //import ru.sbt.util.HTTPDatapool.httpapi.*;
-//import ru.sbt.util.HTTPDatapool.httpapi.Status;
+//import ru.sbt.util.HTTPDatapool.httpapi.ru.sbt.util.HTTPDatapool.httpparameter.Status;
 //
 //import java.io.IOException;
 //import java.util.*;
@@ -16,7 +16,7 @@
 //
 //public class RequestAdderTest {
 //
-//    private MainController mainController;
+//    private ru.sbt.util.HTTPDatapool.httpparameter.MainController mainController;
 //    private DatapoolRequest datapoolRequest;
 //
 //    @BeforeMethod
@@ -27,7 +27,7 @@
 //        set.add(createParametersTable("tableName2", RequestType.RANDOM, "AM_Create", "ID", "IND_NAME", "BIRTH_DATE"));
 //        set.add(createParametersTable("tableName3", RequestType.RANDOM, "AM_Create", "ID", "IND_NAME", "BIRTH_DATE"));
 //
-//        mainController = Mockito.mock(MainController.class);
+//        mainController = Mockito.mock(ru.sbt.util.HTTPDatapool.httpparameter.MainController.class);
 //        datapoolRequest = DatapoolRequest.builder().parametersTables(set).build();
 //
 //        Map<String, String> map = new HashMap<>();
@@ -35,7 +35,7 @@
 //        map.put("IND_NAME", "Dfcz");
 //        map.put("BIRTH_DATE", "321547-651321");
 //
-//        Map<ParametersTable, ResponseTables> collect = datapoolRequest.getParametersTablesStream().collect(Collectors.toMap(o -> o, o -> ResponseTables.builder().mapParameters(map).status(Status.SUCCESS).build()));
+//        Map<ParametersTable, ResponseTables> collect = datapoolRequest.getParametersTablesStream().collect(Collectors.toMap(o -> o, o -> ResponseTables.builder().mapParameters(map).status(ru.sbt.util.HTTPDatapool.httpparameter.Status.SUCCESS).build()));
 //
 //        Response.success(DatapoolResponse.builder().responseTables(collect).build());
 //
@@ -83,8 +83,8 @@
 //
 //    @Test
 //    public void testGetParameters() throws Exception {
-//        RequestAdder requestAdder = new RequestAdder(mainController);
-//        ParameterList parameterList = requestAdder
+//        ru.sbt.util.HTTPDatapool.httpparameter.RequestAdder requestAdder = new ru.sbt.util.HTTPDatapool.httpparameter.RequestAdder(mainController);
+//        ru.sbt.util.HTTPDatapool.httpparameter.ParameterList parameterList = requestAdder
 //                .addRequest("tableName", RequestType.RANDOM, "AM_Create", "ID", "IND_NAME", "BIRTH_DATE")
 //                .addRequest("tableName1", RequestType.RANDOM, "AM_Create", "ID", "IND_NAME", "BIRTH_DATE")
 //                .addRequest("tableName2", RequestType.RANDOM, "AM_Create", "ID", "IND_NAME", "BIRTH_DATE")

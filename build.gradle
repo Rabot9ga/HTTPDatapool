@@ -82,14 +82,5 @@ subprojects {
                 publishPom = true
             }
         }
-        resolve {
-            repository {
-                repoKey = 'atrifactory-gradle-repo'
-                username = "${artifactory_user}"
-                password = "${artifactory_password}"
-                maven = true
-
-            }
-        }
     }
 }

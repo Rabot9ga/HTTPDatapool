@@ -2,7 +2,10 @@ package ru.sbt.util.HTTPDatapool.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.sbt.util.HTTPDatapool.datapool.Datapool;
 import ru.sbt.util.HTTPDatapool.httpapi.DatapoolRequest;
 import ru.sbt.util.HTTPDatapool.httpapi.DatapoolResponse;
@@ -22,14 +25,4 @@ public class MainController {
 
         return ResponseEntity.ok(parameters);
     }
-
-    @GetMapping("/clearCache")
-    public ResponseEntity<Void> clearCache() {
-
-        datapool.clearCache();
-        return ResponseEntity.ok(null);
-    }
-
-
-
 }

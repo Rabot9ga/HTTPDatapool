@@ -1,6 +1,11 @@
+package ru.sbt.util.HTTPDatapool.httpparameter;
+
+import lombok.Data;
+
 import java.util.List;
 import java.util.Map;
 
+@Data
 public class ParameterList {
 
     private List<Map<String,String>> parameters;

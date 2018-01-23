@@ -20,7 +20,7 @@
 //    @Test
 //    public void getParameter() throws Exception {
 //
-//        ParameterList parameterList = HttpParameter.getInstance("http://localhost:8080")
+//        ru.sbt.util.HTTPDatapool.httpparameter.ParameterList parameterList = ru.sbt.util.HTTPDatapool.httpparameter.HttpParameter.getInstance("http://localhost:8080")
 //                .addRequest("tableName", RequestType.RANDOM, "AM_Create", "ID", "IND_NAME", "BIRTH_DATE")
 //                .addRequest("tableName1", RequestType.RANDOM, "AM_Create", "ID", "IND_NAME", "BIRTH_DATE")
 //                .addRequest("tableName2", RequestType.RANDOM, "AM_Create", "ID", "IND_NAME", "BIRTH_DATE")

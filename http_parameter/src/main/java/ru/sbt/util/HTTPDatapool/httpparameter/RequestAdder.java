@@ -1,3 +1,5 @@
+package ru.sbt.util.HTTPDatapool.httpparameter;
+
 import retrofit2.Response;
 import ru.sbt.util.HTTPDatapool.httpapi.*;
 

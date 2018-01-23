@@ -44,6 +44,7 @@ dependencies {
     runtime('org.springframework.boot:spring-boot-devtools')
 //	runtime('org.postgresql:postgresql')
 
+    compile project(':http_parameter')
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('com.squareup.retrofit2:retrofit:2.3.0')
     testCompile('com.squareup.retrofit2:converter-jackson:2.3.0')
