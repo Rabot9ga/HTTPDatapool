@@ -31,8 +31,8 @@ public class DataRepository implements DBConnection {
     private ExecutorService service;
 
     @PostConstruct
-    private void init(){
-         selectThread = new CustomizableThreadFactory("selectThread");
+    private void init() {
+        selectThread = new CustomizableThreadFactory("selectThread");
         service = Executors.newFixedThreadPool(countThread, selectThread);
     }
 
@@ -128,6 +128,7 @@ public class DataRepository implements DBConnection {
         log.info("countRowsOneSelect: {}", countRowsOneSelect);
         log.info("countThread: {}", countThread);
         if (partOfJob.putIfAbsent(tableName, 0d) != null) {
+            // FIXME: 24.01.2018 Полная дичь!
             return null;
         }
 
@@ -146,10 +147,8 @@ public class DataRepository implements DBConnection {
 
             try {
                 result.addAll(future.get());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
+            } catch (InterruptedException | ExecutionException e) {
+                log.error("Can't get batch from database", e);
             }
             partOfJob.replace(tableName, (double) (i + 1) / ((double) futures.size()));
             log.info("Table {} loaded by {} percent", tableName, partOfJob.get(tableName) * 100);
