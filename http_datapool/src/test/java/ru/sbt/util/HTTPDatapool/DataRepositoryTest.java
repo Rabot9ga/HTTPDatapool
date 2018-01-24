@@ -34,6 +34,14 @@ public class DataRepositoryTest extends AbstractTransactionalTestNGSpringContext
         assertTrue(result.size() > 0);
 
     }
+    @Test
+    public void getAllTableFromDB() {
+
+
+        List<String> allTableNamesInDB = dataRepository.getAllTableNamesInDB();
+        assertTrue(allTableNamesInDB.contains("FORTEST"));
+
+    }
 
      @Test
     public void getSomeColumnFromTableThread() {

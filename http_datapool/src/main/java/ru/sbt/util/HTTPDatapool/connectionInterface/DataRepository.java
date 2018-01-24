@@ -97,9 +97,16 @@ public class DataRepository implements DBConnection {
     }
 
     @Override
-    public List<String> getAllTableNames() {
+    public List<String> getAllTableNamesInCache() {
         return partOfJob.entrySet().stream()
                 .map(stringDoubleEntry -> stringDoubleEntry.getKey())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getAllTableNamesInDB() {
+        return jdbcTemplate.queryForList("select table_name from User_TABLES").stream()
+                .map(entry -> entry.get("TABLE_NAME").toString())
                 .collect(Collectors.toList());
     }
 
