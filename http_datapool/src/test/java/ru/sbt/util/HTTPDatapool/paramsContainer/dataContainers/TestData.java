@@ -7,7 +7,7 @@ import java.util.Map;
 
 public abstract class TestData extends TestSettings{
     // list used in addTable
-    List<Map<String, String>> list = Generator.fillDataList(containerSize);
+    List<Map<String, Object>> list = Generator.fillDataList(containerSize);
 
 
 

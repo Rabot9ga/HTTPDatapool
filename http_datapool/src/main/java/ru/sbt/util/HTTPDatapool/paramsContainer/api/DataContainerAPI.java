@@ -3,23 +3,22 @@ package ru.sbt.util.HTTPDatapool.paramsContainer.api;
 import ru.sbt.util.HTTPDatapool.httpapi.RequestType;
 
 import java.util.List;
-import java.util.Map;
 
-public interface DataContainerAPI {
+public interface DataContainerAPI<T> {
 
     /**
      * getting required data from pool using specified RequestType
      *
      * @return row with required data
      */
-    Map<String, String> getRow();
+    T getRow();
 
     /**
      * adding data to structured pool
      */
-    void addRow(Map<String, String> row);
+    void addRow(T row);
 
-    void addTable(List<Map<String, String>> collection);
+    void addTable(List<T> collection);
 
     int getSize();
 

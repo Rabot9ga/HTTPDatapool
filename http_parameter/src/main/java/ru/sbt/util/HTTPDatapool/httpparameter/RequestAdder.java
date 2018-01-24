@@ -51,7 +51,7 @@ public class RequestAdder {
 
         Map<ParametersTable, ResponseTables> responseTables = body.getResponseTables();
 
-        List<Map<String, String>> list = requestSet.stream()
+        List<Map<String, Object>> list = requestSet.stream()
                 .map(responseTables::get)
                 .map(ResponseTables::getMapParameters)
                 .collect(Collectors.toList());

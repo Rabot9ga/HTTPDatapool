@@ -7,7 +7,6 @@ import ru.sbt.util.HTTPDatapool.paramsContainer.dataContainers.DataContainerSequ
 import ru.sbt.util.HTTPDatapool.paramsContainer.dataContainers.DataContainerUnique;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Class for providing composite object with ready for consuming structured parametrization
@@ -16,28 +15,29 @@ import java.util.Map;
  */
 public class DataContainerFactory {
 
-    public static DataContainerAPI create(RequestType type) {
+    public static <T> DataContainerAPI<T> create(RequestType type) {
         return createContainer(type, null);
     }
 
-    public static DataContainerAPI create(RequestType type, List<Map<String, String>> collection) {
+    public static <T> DataContainerAPI<T> create(RequestType type, List<T> collection) {
         return createContainer(type, collection);
     }
-    private static DataContainerAPI createContainer(RequestType type, List<Map<String, String>> collection){
-        DataContainerAPI dataContainer;
+
+    private static <T> DataContainerAPI<T> createContainer(RequestType type, List<T> collection){
+        DataContainerAPI<T> dataContainer;
 
         switch (type) {
             case RANDOM:
-                dataContainer = new DataContainerRandom(collection);
+                dataContainer = new DataContainerRandom<T>(collection);
                 break;
             case SEQUENTIAL:
-                dataContainer = new DataContainerSequential(collection);
+                dataContainer = new DataContainerSequential<T>(collection);
                 break;
             case UNIQUE_SEQUENTIAL:
-                dataContainer = new DataContainerUnique(type, collection);
+                dataContainer = new DataContainerUnique<T>(type, collection);
                 break;
             case UNIQUE_RANDOM:
-                dataContainer = new DataContainerUnique(type, collection);
+                dataContainer = new DataContainerUnique<T>(type, collection);
                 break;
             default:
                 throw new RuntimeException("Can't create DataContainer", new IllegalArgumentException("Wrong RequestType format!"));

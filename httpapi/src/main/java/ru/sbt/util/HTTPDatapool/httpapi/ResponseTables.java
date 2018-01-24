@@ -10,7 +10,7 @@ import java.util.Map;
 @Builder
 public class ResponseTables implements Serializable {
 
-    Map<String, String> mapParameters;
+    Map<String, Object> mapParameters;
     Status status;
     String statusMessage;
 }

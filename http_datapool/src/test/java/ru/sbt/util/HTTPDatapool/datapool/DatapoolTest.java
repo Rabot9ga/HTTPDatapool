@@ -28,7 +28,7 @@ public class DatapoolTest {
     private HashSet<String> columns;
     private DBConnection dbConnection;
 
-    private Map<String, List<Map<String, String>>> tableMap;
+    private Map<String, List<Map<String, Object>>> tableMap;
 
     @BeforeTest
     public void setUp() throws Exception {
@@ -65,7 +65,7 @@ public class DatapoolTest {
                         .build())
                 .collect(Collectors.toList());
 
-        List<List<Map<String, String>>> parametersFromDB = IntStream.rangeClosed(1, 10)
+        List<List<Map<String, Object>>> parametersFromDB = IntStream.rangeClosed(1, 10)
                 .mapToObj(value -> tableMap.get("Script" + value))
 
                 .collect(Collectors.toList());

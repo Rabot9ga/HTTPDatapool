@@ -8,7 +8,7 @@ import java.util.Set;
 public interface DBConnection {
 
 
-    List<Map<String, String>> getDataFromCache(String tableName, Set<String> columnNames);
+    List<Map<String, Object>> getDataFromCache(String tableName, Set<String> columnNames);
 
     void clearAllCaches();
 
