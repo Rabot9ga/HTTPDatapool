@@ -28,12 +28,18 @@ public class DataRepository implements DBConnection {
     private int countThread;
 
     private CustomizableThreadFactory selectThread;
-    private ExecutorService service;
+    private ThreadPoolExecutor service;
 
     @PostConstruct
     private void init() {
         selectThread = new CustomizableThreadFactory("selectThread");
-        service = Executors.newFixedThreadPool(countThread, selectThread);
+//        service = Executors.newFixedThreadPool(countThread, selectThread);
+        service = new ThreadPoolExecutor(countThread, countThread,
+                30, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(),
+                selectThread);
+        service.allowCoreThreadTimeOut(true);
+
     }
 
 
