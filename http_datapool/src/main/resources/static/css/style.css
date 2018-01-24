@@ -2,12 +2,12 @@
 === General ===
 */
 .inner-wrapper{
-    width: 60%;
+    width: 70%;
     margin: 0 auto;
 }
 .inner-wrapper input.search-query{
-    width: 50%;
-    margin: 20px 0;
+    margin: 0 10px;
+    width: 400px;
 }
 
 .wrapper{
@@ -61,35 +61,6 @@ h4{
 }
 
 /*
-=== Bootstrap additional ===
-*/
-
-.row + .row {
-    margin-top: 1rem;
-}
-
-.margined-bottom{
-    margin-bottom: 25px;
-}
-
-/*
-=== search Results helper ===
-*/
-#searchResults{
-    position: absolute;
-    display: none;
-    background-color: #EEE;
-}
-
-.search-results-row{
-    padding: 5px;
-}
-
-.search-results-row:hover{
-    background-color: gold;
-}
-
-/*
 === Tabs ===
 */
 .tabs-cyan {
@@ -113,11 +84,37 @@ h4{
 }
 
 .tab-content{
-    padding:20px 10px;
+    padding:10px 10px;
+}
+/*
+=== Main page ===
+*/
+.row > div.search-line > span{
+    line-height: 35px;
+}
+
+.row > div{
+    width:250px;
+}
+
+.add-block{
+    padding: 15px 0;
+    margin: 10px 0;
+}
+.search-block{
+    padding: 15px 0;
+    margin: 10px 0;
+}
+
+.row input{
+    margin: 0;
+}
+.row a{
+    margin: 0;
 }
 
 /*
-=== Tabs ===
+=== Old browser ===
 */
 .old-browser-banner {
     padding: 0px 30px 10px;

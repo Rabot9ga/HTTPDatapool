@@ -21,19 +21,22 @@
     <script src="js/starter.js"></script>
 </head>
 <body>
-<h3>Main</h3>
+<header class="wrapper">
+    <img src="MDB/img/dblogo.png" style="height: 60px;"/>
+    <h3>HTTPDataPool</h3>
+</header>
 <!-- Nav tabs -->
 <div class="tabs-wrapper tabs-cyan">
     <ul class="nav classic-tabs wrapper" role="tablist">
         <li class="nav-item">
             <a class="nav-link waves-light active" data-toggle="tab" href="#panel1" role="tab"><i class="fa fa-list"
                                                                                                   aria-hidden="true"></i>
-                Содержимое кэша</a>
+                Операции с кэшем</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link waves-light" data-toggle="tab" href="#panel2" role="tab"><i class="fa fa-plus"
+            <a class="nav-link waves-light" data-toggle="tab" href="#panel2" role="tab"><i class="fa fa-user-o"
                                                                                            aria-hidden="true"></i>
-                Добавить в кэш</a>
+                Кто это накостылил?</a>
         </li>
     </ul>
 </div>
@@ -41,15 +44,40 @@
 <!-- Tab panels -->
 <div class="tab-content card console ">
     <div class="tab-pane fade in show active wrapper" id="panel1" role="tabpanel">
-        <h4>Содержимое кэша</h4>
+        <h4>Операции с кэшем</h4>
 
         <div ng-controller="getCacheContent" class="inner-wrapper">
-            <span class="h6 mx-3">Поиск:</span>
-            <input type="text" ng-model="query" ng-change="search()" class="input-large search-query"/>
-            <a href ng-click="getTables()" class="btn btn-danger"><i class="fa fa-refresh" aria-hidden="true"></i></a>
-            <div>
-                <span class="h6 mx-3">Автообновление:</span>
-                <input type="checkbox" ng-model="enableAutoRefreshTableCheckbox" ng-change="enableAutoRefreshTable()" class="input-small">
+            <div class="add-block border border-success rounded">
+                <div class="row">
+                    <div class="col-xs-2 search-line">
+                        <span class="h6 mx-5">Добавить таблицу:</span>
+                    </div>
+                    <div class="col-sm-5 search-line">
+                        <input type="text" class="input-large search-query" ng-model="post.tableToAdd" placeholder="Имя таблицы" ng-keydown="$event.keyCode === 13 && addTableCache(post.tableToAdd)"/>
+                    </div>
+                    <div class="col-md-2 search-line">
+                        <a href ng-click="addTableCache(post.tableToAdd)" class="btn btn-info waves-effect waves-light"
+                               role="button">Добавить <i class="fa fa-plus" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+
+            </div>
+            <div class="search-block border border-info rounded">
+                <div class="row">
+                    <div class="col-xs-2 search-line">
+                        <span class="h6 mx-5">Поиск:</span>
+                    </div>
+                    <div class="col-sm-5 search-line">
+                        <input type="text" ng-model="query" ng-change="search()" class="input-large search-query" placeholder="Имя таблицы"/>
+                    </div>
+                    <div class="col-sm-2 search-line">
+                        <a href ng-click="getTables()" class="btn btn-danger">Обновить <i class="fa fa-refresh" aria-hidden="true"></i></a>
+                    </div>
+                    <div class="col-sm-2 search-line">
+                        <span class="h6 mx-2">Автообновление:</span>
+                        <input type="checkbox" ng-model="enableAutoRefreshTableCheckbox" ng-change="enableAutoRefreshTable()" class="input-small">
+                    </div>
+                </div>
             </div>
 
             <table class="table table-striped table-condensed table-hover">
@@ -114,16 +142,9 @@
     </div>
 
     <div class="tab-pane fade wrapper" id="panel2" role="tabpanel">
-        <h4>Добавить таблицу в кэш</h4>
-
-        <div ng-controller="getCacheContent" class="inner-wrapper">
-            <span class="h6 mx-3">Имя таблицы:</span>
-            <input type="text" class="input-large search-query" ng-model="post.tableToAdd" placeholder="Имя таблицы"/>
-            <div>
-                <a href ng-click="addTableCache(post.tableToAdd)" class="btn btn-info waves-effect waves-light"
-                   role="button">Добавить <i class="fa fa-plus" aria-hidden="true"></i></a>
-            </div>
-
+        <h4>Об авторах</h4>
+        <div style="margin: 0 auto; width:500px">
+            <img src="MDB/img/pigs.png" >
         </div>
     </div>
 
