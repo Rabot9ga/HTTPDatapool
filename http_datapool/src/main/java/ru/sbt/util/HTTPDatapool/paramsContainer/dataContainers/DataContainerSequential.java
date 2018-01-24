@@ -7,16 +7,15 @@ import ru.sbt.util.HTTPDatapool.paramsContainer.api.DataContainerAPI;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 @Slf4j
-public class DataContainerSequential extends AbstractDataContainer implements DataContainerAPI {
+public class DataContainerSequential<T> extends AbstractDataContainer implements DataContainerAPI<T> {
 
-    private Deque<Map<String, String>> queueIn = new ConcurrentLinkedDeque<>();
-    private List<Map<String, String>> list = new ArrayList<>(1_000);
+    private Deque<T> queueIn = new ConcurrentLinkedDeque<>();
+    private List<T> list = new ArrayList<>(1_000);
 
-    public DataContainerSequential(List<Map<String, String>> collection) {
+    public DataContainerSequential(List<T> collection) {
         super.requestType = RequestType.SEQUENTIAL;
         if (collection != null) {
             this.addTable(collection);
@@ -24,10 +23,9 @@ public class DataContainerSequential extends AbstractDataContainer implements Da
     }
 
     @Override
-    public Map<String, String> getRow() {
+    public T getRow() {
 
-        Map<String, String> row;
-
+        T row;
         row = queueIn.poll();
         if (row == null) {
             synchronized (this) {
@@ -43,13 +41,13 @@ public class DataContainerSequential extends AbstractDataContainer implements Da
     }
 
     @Override
-    public void addRow(Map<String, String> row) {
+    public void addRow(T row) {
         list.add(row);
         queueIn.addLast(row);
     }
 
     @Override
-    public void addTable(List<Map<String, String>> collection) {
+    public void addTable(List<T> collection) {
         list.addAll(collection);
     }
 

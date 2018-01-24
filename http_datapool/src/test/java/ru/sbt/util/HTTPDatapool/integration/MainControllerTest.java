@@ -34,28 +34,17 @@ public class MainControllerTest extends AbstractTransactionalTestNGSpringContext
     @Test
     public void getParameter() throws IOException, InterruptedException {
 
-
-//        for (int i = 0; i < 100; i++) {
-//            ParameterList parameters = HttpParameter.getInstance("http://localhost:" + port)
-//                    .addRequest("FORTEST", RequestType.RANDOM, "testScript", "ID", "NAME", "AGE", "PHONE")
-//                    .getParameters();
-//            System.out.println("parameters = " + parameters);
-//            Thread.sleep(1000);
-//
-//        }
-
         ExecutorService service = Executors.newFixedThreadPool(1);
-
-
 
         Callable<ParameterList> callable = () -> HttpParameter.getInstance("http://localhost:" + port)
 //                .addRequest("TABLE1", RequestType.RANDOM, "testScript", "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4")
-                .addRequest("TABLE2", RequestType.RANDOM, "testScript", "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4")
+//                .addRequest("TABLE2", RequestType.RANDOM, "testScript", "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4")
 //                .addRequest("TABLE3", RequestType.RANDOM, "testScript", "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4")
+                .addRequest("FORTEST", RequestType.RANDOM, "testScript", "ID", "NAME", "AGE", "PHONE")
                 .getParameters();
 
 
-        List<Future<ParameterList>> collect = IntStream.range(0, 100000000).mapToObj(value -> service.submit(callable)).collect(Collectors.toList());
+        List<Future<ParameterList>> collect = IntStream.range(0, 100000).mapToObj(value -> service.submit(callable)).collect(Collectors.toList());
 
         for (Future<ParameterList> parameterListFuture : collect) {
             ParameterList parameterList = null;

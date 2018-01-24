@@ -7,14 +7,13 @@ import ru.sbt.util.HTTPDatapool.httpapi.RequestType;
 import ru.sbt.util.HTTPDatapool.paramsContainer.api.DataContainerAPI;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
 @Data
 @Builder
-public class TableContainer {
-    DataContainerAPI container;
+public class TableContainer<T> {
+    DataContainerAPI<T> container;
     String tableName;
     Set<String> columnsName;
     String scriptName;
@@ -26,7 +25,7 @@ public class TableContainer {
                 && this.scriptName.equals(scriptName);
     }
 
-    public boolean isFit(ParametersTable parametersTable){
+    public boolean isFit(ParametersTable parametersTable) {
 
         return this.tableName.equals(parametersTable.getTableName())
                 && this.scriptName.equals(parametersTable.getScriptName())
@@ -34,10 +33,10 @@ public class TableContainer {
                 && this.container.getRequestType() == parametersTable.getType();
     }
 
-    public Map<String, String> getDataOrElse(Supplier<List<Map<String, String>>> supplier) {
-        if (container.getSize() <= 0){
-            synchronized (container){
-                if (container.getSize() <= 0){
+    public T getDataOrElse(Supplier<List<T>> supplier) {
+        if (container.getSize() <= 0) {
+            synchronized (container) {
+                if (container.getSize() <= 0) {
                     container.addTable(supplier.get());
                 }
             }

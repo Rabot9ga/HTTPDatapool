@@ -5,13 +5,12 @@ import ru.sbt.util.HTTPDatapool.paramsContainer.api.DataContainerAPI;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class DataContainerRandom extends AbstractDataContainer implements DataContainerAPI {
-    private List<Map<String, String>> list = new ArrayList<>(5_000);
+public class DataContainerRandom<T> extends AbstractDataContainer implements DataContainerAPI<T> {
+    private List<T> list = new ArrayList<>(5_000);
 
-    public DataContainerRandom(List<Map<String, String>> collection) {
+    public DataContainerRandom(List<T> collection) {
         super.requestType = RequestType.RANDOM;
         if (collection != null) {
             this.addTable(collection);
@@ -19,19 +18,19 @@ public class DataContainerRandom extends AbstractDataContainer implements DataCo
     }
 
     @Override
-    public Map<String, String> getRow() {
+    public T getRow() {
         if (list.isEmpty())
             throw new IllegalArgumentException("Container is empty");
         return list.get(ThreadLocalRandom.current().nextInt(list.size()));
     }
 
     @Override
-    public void addRow(Map<String, String> row) {
+    public void addRow(T row) {
         list.add(row);
     }
 
     @Override
-    public void addTable(List<Map<String, String>> collection) {
+    public void addTable(List<T> collection) {
         list = collection;
     }
 

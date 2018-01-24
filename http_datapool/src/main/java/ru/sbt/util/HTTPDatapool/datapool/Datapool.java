@@ -21,7 +21,7 @@ public class Datapool {
     @Autowired
     DBConnection dbConnection;
 
-    ConcurrentHashMap<ParametersTable, TableContainer> mapContainer = new ConcurrentHashMap<>();
+    ConcurrentHashMap<ParametersTable, TableContainer<Map<String, Object>>> mapContainer = new ConcurrentHashMap<>();
 
     public DatapoolResponse getParameters(DatapoolRequest datapoolRequest) {
 
@@ -33,7 +33,7 @@ public class Datapool {
         return DatapoolResponse.builder().responseTables(responseMap).build();
     }
 
-    public void clearCache(String tableName){
+    public void clearCache(String tableName) {
         log.info("Remove keys from datapool with name: {}", tableName);
         ParametersTable parameters;
         List<ParametersTable> keyToDelete = mapContainer.keySet().stream()
@@ -44,33 +44,34 @@ public class Datapool {
         keyToDelete.forEach(parametersTable -> mapContainer.remove(parametersTable));
     }
 
-    private ResponseTables buildResponseTable(TableContainer tableContainer) {
-        return ResponseTables.builder()
-                .mapParameters(getDataFromContainer(tableContainer))
-                .status(Status.SUCCESS)
-                .build();
-    }
+    private TableContainer<Map<String, Object>> createTableContainer(ParametersTable parametersTable) {
 
-    private Map<String, String> getDataFromContainer(TableContainer tableContainer) {
-        return tableContainer.getDataOrElse(
-                () -> dbConnection.getDataFromCache(
-                        tableContainer.getTableName(),
-                        tableContainer.getColumnsName()));
-    }
-
-    private TableContainer createTableContainer(ParametersTable parametersTable) {
-        TableContainer container = TableContainer.builder()
+        TableContainer<Map<String, Object>> container = TableContainer.<Map<String, Object>>builder()
                 .scriptName(parametersTable.getScriptName())
                 .columnsName(parametersTable.getColumnsName())
                 .container(DataContainerFactory.create(parametersTable.getType()))
                 .tableName(parametersTable.getTableName())
                 .build();
 
-        TableContainer tableContainer = mapContainer.putIfAbsent(parametersTable, container);
+        TableContainer<Map<String, Object>> tableContainer = mapContainer.putIfAbsent(parametersTable, container);
         if (tableContainer == null) {
             tableContainer = mapContainer.get(parametersTable);
         }
         return tableContainer;
+    }
+
+    private ResponseTables buildResponseTable(TableContainer<Map<String, Object>> tableContainer) {
+        return ResponseTables.builder()
+                .mapParameters(getDataFromContainer(tableContainer))
+                .status(Status.SUCCESS)
+                .build();
+    }
+
+    private Map<String, Object> getDataFromContainer(TableContainer<Map<String, Object>> tableContainer) {
+        return tableContainer.getDataOrElse(
+                () -> dbConnection.getDataFromCache(
+                        tableContainer.getTableName(),
+                        tableContainer.getColumnsName()));
     }
 
 }

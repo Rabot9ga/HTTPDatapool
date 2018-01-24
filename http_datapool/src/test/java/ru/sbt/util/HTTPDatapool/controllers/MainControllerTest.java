@@ -3,6 +3,7 @@ package ru.sbt.util.HTTPDatapool.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Slf4j
@@ -65,7 +67,7 @@ public class MainControllerTest extends AbstractTransactionalTestNGSpringContext
 
         String tableName = "FORTEST";
 
-        List<Map<String, String>> dataFromCache = dbConnection.getDataFromCache(tableName, columns);
+        List<Map<String, Object>> dataFromCache = dbConnection.getDataFromCache(tableName, columns);
 
         ParametersTable parametersTable = ParametersTable.builder()
                 .scriptName("FORTEST")
@@ -91,9 +93,23 @@ public class MainControllerTest extends AbstractTransactionalTestNGSpringContext
         DatapoolResponse datapoolResponse = response.body();
         log.info("DatapoolResponse: {}", datapoolResponse);
 
-        datapoolResponse.getResponseTables().forEach((parametersTable1, responseTables) -> Assert.assertTrue(dataFromCache.contains(responseTables.getMapParameters())));
+        List<Map<String, String>> dataFromCacheConvert = dataFromCache.stream()
+                .map(this::convertMap)
+                .collect(Collectors.toList());
+
+
+
+        datapoolResponse.getResponseTables().forEach((parametersTable1, responseTables) -> Assert.assertTrue(dataFromCacheConvert.contains(convertMap(responseTables.getMapParameters()))));
+
+
         log.info("=======================================================");
         log.info("=======================================================");
 
+    }
+
+    private Map<String, String> convertMap(Map<String, Object> map) {
+        return map.entrySet().stream()
+                .map(entry -> ImmutablePair.of(entry.getKey(), entry.getValue().toString()))
+                .collect(Collectors.toMap(o -> o.left, o -> o.right));
     }
 }

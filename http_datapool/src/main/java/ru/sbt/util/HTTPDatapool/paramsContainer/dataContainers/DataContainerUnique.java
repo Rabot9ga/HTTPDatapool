@@ -6,14 +6,13 @@ import ru.sbt.util.HTTPDatapool.paramsContainer.api.DataContainerAPI;
 import java.lang.instrument.IllegalClassFormatException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
-public class DataContainerUnique extends AbstractDataContainer implements DataContainerAPI {
+public class DataContainerUnique<T> extends AbstractDataContainer implements DataContainerAPI<T> {
 
-    private Queue queue = new ConcurrentLinkedQueue<Map<String, String>>();
+    private Queue queue = new ConcurrentLinkedQueue<T>();
 
     public DataContainerUnique(RequestType type, Collection collection) {
         if (!(type.equals(RequestType.UNIQUE_RANDOM) || type.equals(RequestType.UNIQUE_SEQUENTIAL)))
@@ -22,17 +21,17 @@ public class DataContainerUnique extends AbstractDataContainer implements DataCo
     }
 
     @Override
-    public Map<String, String> getRow() {
+    public T getRow() {
         throw new UnsupportedOperationException("Not supported yet");
     }
 
     @Override
-    public void addRow(Map<String, String> row) {
+    public void addRow(T row) {
         throw new UnsupportedOperationException("Not supported yet");
     }
 
     @Override
-    public void addTable(List<Map<String, String>> collection) {
+    public void addTable(List<T> collection) {
         throw new UnsupportedOperationException("Not supported yet");
     }
 

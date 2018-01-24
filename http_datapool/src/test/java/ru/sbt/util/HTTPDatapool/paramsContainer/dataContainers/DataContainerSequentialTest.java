@@ -16,7 +16,7 @@ import java.util.Map;
 @Slf4j
 public class DataContainerSequentialTest extends TestData {
 
-    private DataContainerAPI container;
+    private DataContainerAPI<Map<String, Object>> container;
 
     @BeforeClass
     public void setUp() {
@@ -32,7 +32,7 @@ public class DataContainerSequentialTest extends TestData {
     @Test(enabled = false)
     public void getRow_SingleThrd_Visual(){
         for (int i = 0; i < containerSize * 2; i++) {
-            Map<String, String> row = container.getRow();
+            Map<String, Object> row = container.getRow();
             log.debug("ID: {} Name: {}", row.get("id"), row.get("name"));
         }
     }

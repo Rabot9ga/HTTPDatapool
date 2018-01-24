@@ -40,17 +40,17 @@ public class Generator {
         return container;
     }
 
-    static public Map<String, String> fillDataMap(int id) {
-        HashMap<String, String> map = new HashMap<>();
-        map.put("id", Integer.toString(id));
+    static public Map<String, Object> fillDataMap(int id) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("id", id);
         map.put("name", "Vasya_" + ThreadLocalRandom.current().nextInt(100));
         map.put("phone", "7891-" + ThreadLocalRandom.current().nextInt(1000, 8999));
 
         return map;
     }
 
-    static public List<Map<String, String>> fillDataList(int rows) {
-        List<Map<String, String>> list = new ArrayList<>();
+    static public List<Map<String, Object>> fillDataList(int rows) {
+        List<Map<String, Object>> list = new ArrayList<>();
 
         if (rows <= 0) throw new IllegalArgumentException("Number of rows must be > 0!");
 

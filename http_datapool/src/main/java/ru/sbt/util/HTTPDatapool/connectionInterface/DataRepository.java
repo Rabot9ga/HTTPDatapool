@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class DataRepository implements DBConnection {
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    private ConcurrentHashMap<String, List<Map<String, String>>> cache = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, List<Map<String, Object>>> cache = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, Double> partOfJob = new ConcurrentHashMap<>();
     @Value("${countRowsOneSelect:1000}")
     private int countRowsOneSelect;
@@ -33,7 +33,6 @@ public class DataRepository implements DBConnection {
     @PostConstruct
     private void init() {
         selectThread = new CustomizableThreadFactory("selectThread");
-//        service = Executors.newFixedThreadPool(countThread, selectThread);
         service = new ThreadPoolExecutor(countThread, countThread,
                 30, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<>(),
@@ -47,17 +46,15 @@ public class DataRepository implements DBConnection {
         return Integer.parseInt(jdbcTemplate.queryForObject("SELECT COUNT (*) FROM " + tableName, String.class));
     }
 
-    private List<Map<String, String>> getFromTableBetween(String tableName, int from, int to) throws DataAccessException {
+    private List<Map<String, Object>> getFromTableBetween(String tableName, int from, int to) throws DataAccessException {
         String query = "SELECT * FROM (SELECT ROWNUM NUM, A.* FROM " + tableName + " A) B ";
         query += "WHERE B.NUM BETWEEN " + from + " and " + to;
-        return jdbcTemplate.queryForList(query).stream()
-                .map(this::castMapValue)
-                .collect(Collectors.toList());
+        return jdbcTemplate.queryForList(query);
     }
 
     @Override
-    public List<Map<String, String>> getDataFromCache(String tableName, Set<String> columnNames) {
-        List<Map<String, String>> table = cache.entrySet().stream()
+    public List<Map<String, Object>> getDataFromCache(String tableName, Set<String> columnNames) {
+        List<Map<String, Object>> table = cache.entrySet().stream()
                 .filter(entry -> entry.getKey().equals(tableName))
                 .map(Map.Entry::getValue)
                 .findAny()
@@ -130,7 +127,7 @@ public class DataRepository implements DBConnection {
     }
 
 
-    private List<Map<String, String>> cachePut(String tableName) {
+    private List<Map<String, Object>> cachePut(String tableName) {
         log.info("countRowsOneSelect: {}", countRowsOneSelect);
         log.info("countThread: {}", countThread);
         if (partOfJob.putIfAbsent(tableName, 0d) != null) {
@@ -141,15 +138,15 @@ public class DataRepository implements DBConnection {
         int countRows = getTableSize(tableName);
         log.info("countRows: {}", countRows);
 
-        List<Future<List<Map<String, String>>>> futures = new ArrayList<>();
+        List<Future<List<Map<String, Object>>>> futures = new ArrayList<>();
         for (int i = 0; i < countRows / countRowsOneSelect + 1; i++) {
             int from = i * countRowsOneSelect + 1;
             int to = (i + 1) * countRowsOneSelect;
             futures.add(service.submit(() -> getFromTableBetween(tableName, from, to)));
         }
         int i = 0;
-        List<Map<String, String>> result = new ArrayList<>();
-        for (Future<List<Map<String, String>>> future : futures) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Future<List<Map<String, Object>>> future : futures) {
 
             try {
                 result.addAll(future.get());
@@ -164,9 +161,9 @@ public class DataRepository implements DBConnection {
         return result;
     }
 
-    private Map<String, String> filterTableByColumns(Map<String, String> stringStringMap, Set<String> columnNames) {
-        return stringStringMap.entrySet().stream()
-                .filter(stringStringEntry -> columnNames.contains(stringStringEntry.getKey()))
+    private Map<String, Object> filterTableByColumns(Map<String, Object> stringObjectMap, Set<String> columnNames) {
+        return stringObjectMap.entrySet().stream()
+                .filter(stringObjectEntry -> columnNames.contains(stringObjectEntry.getKey()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 

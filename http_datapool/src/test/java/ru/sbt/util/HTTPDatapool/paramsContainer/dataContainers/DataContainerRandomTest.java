@@ -16,7 +16,7 @@ import java.util.Map;
 @Slf4j
 public class DataContainerRandomTest extends TestData {
 
-    private DataContainerAPI container;
+    private DataContainerAPI<Map<String, Object>> container;
 
     @BeforeClass
     public void setUp() throws Exception {
@@ -31,17 +31,17 @@ public class DataContainerRandomTest extends TestData {
 
     @Test(enabled = false)
     public void getRow_SingleThrd_Visual() throws Exception {
-        DataContainerAPI container = DataContainerFactory.create(RequestType.RANDOM, list);
+        DataContainerAPI<Map<String, Object>> container = DataContainerFactory.create(RequestType.RANDOM, list);
 
         for (int i = 0; i < containerSize; i++) {
-            Map<String, String> row = container.getRow();
+            Map<String, Object> row = container.getRow();
             log.debug("ID: {} Name: {}", row.get("id"), row.get("name"));
         }
     }
 
     @Test
     public void getRowFunctionalTest_Concurrent() {
-        DataContainerAPI container = DataContainerFactory.create(RequestType.RANDOM, list);
+        DataContainerAPI<Map<String, Object>> container = DataContainerFactory.create(RequestType.RANDOM, list);
 
         // sending returned list of id's for validation
 
