@@ -18,8 +18,12 @@ public interface DBConnection {
 
     double getLoadedPercent(String tableName);
 
-    List<String> getAllTableNames();
+    List<String> getAllTableNamesInCache();
+
+    List<String> getAllTableNamesInDB();
 
     List<Map<String,String>> getAllInfoAboutTablesInCache();
+
+
 
 }
