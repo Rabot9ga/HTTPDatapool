@@ -12,6 +12,7 @@ import ru.sbt.util.HTTPDatapool.controllers.dto.StatusContainer;
 import ru.sbt.util.HTTPDatapool.datapool.Datapool;
 
 import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -146,6 +147,7 @@ public class FrontEndController {
         String name = osBean.getName();
         String arch = osBean.getArch();
 
+        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
 
         List<MetricsContainer> list = new ArrayList<>();
         if (processCpuLoad != -1)
@@ -156,13 +158,22 @@ public class FrontEndController {
         if (systemLoadAverage != -1)
             list.add(new MetricsContainer("systemLoadAverage", systemLoadAverage + " %", "-1 если не поддерживается"));
 
-        list.add(new MetricsContainer("totalPhysicalMemorySize)", totalPhysicalMemorySize + " MB", "Общее количество физической памяти"));
-        list.add(new MetricsContainer("freePhysicalMemorySize)", freePhysicalMemorySize + " MB", "Свободно физической памяти"));
+        list.add(new MetricsContainer("totalPhysicalMemorySize", totalPhysicalMemorySize + " MB", "Общее количество физической памяти"));
+        list.add(new MetricsContainer("freePhysicalMemorySize", freePhysicalMemorySize + " MB", "Свободно физической памяти"));
         list.add(new MetricsContainer("Xmx", Runtime.getRuntime().maxMemory() / 1024 / 1024 + " MB", "СЮДА НЕ СМОТРИМ"));
+        list.add(new MetricsContainer("freeMemory", Runtime.getRuntime().freeMemory() / 1024 / 1024 + " MB", "Доступно памяти для JVM"));
 
-        list.add(new MetricsContainer("availableProcessors", "" + availableProcessors, "Количество CPU"));
+        list.add(new MetricsContainer("", "" , ""));
+        list.add(new MetricsContainer("Heap Max", memoryMXBean.getHeapMemoryUsage().getMax() / 1024 / 1024 + " MB" , ""));
+        list.add(new MetricsContainer("Heap Committed", memoryMXBean.getHeapMemoryUsage().getCommitted() / 1024 / 1024 + " MB" , ""));
+        list.add(new MetricsContainer("Heap Used", memoryMXBean.getHeapMemoryUsage().getUsed() / 1024 / 1024 + " MB" , ""));
+        list.add(new MetricsContainer("nonHeap Committed", memoryMXBean.getNonHeapMemoryUsage().getCommitted() / 1024 / 1024 + " MB" , ""));
+        list.add(new MetricsContainer("nonHeap Used", memoryMXBean.getNonHeapMemoryUsage().getUsed() / 1024 / 1024 + " MB" , ""));
+        list.add(new MetricsContainer("", "" , ""));
+
         list.add(new MetricsContainer("ОС", "" + name, ""));
         list.add(new MetricsContainer("Архитектура", "" + arch, ""));
+        list.add(new MetricsContainer("availableProcessors", "" + availableProcessors, "Количество CPU"));
 
 
 

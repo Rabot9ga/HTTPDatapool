@@ -65,7 +65,7 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
                         buttons: {
                             gotIt: {
                                 text: 'Я понял',
-                                keys:['enter, esc'],
+                                keys:['enter'],
                                 action: function () {
                                     $scope.getTables();
                                 }
@@ -82,7 +82,7 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
                         buttons: {
                             gotIt: {
                                 text: 'OK',
-                                keys:['enter, esc']
+                                keys:['enter']
                             }
                         }
                     });
