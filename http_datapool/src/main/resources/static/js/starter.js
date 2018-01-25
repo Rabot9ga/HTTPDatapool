@@ -65,7 +65,7 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
                         buttons: {
                             gotIt: {
                                 text: 'Я понял',
-                                keys:['enter'],
+                                keys:['enter, esc'],
                                 action: function () {
                                     $scope.getTables();
                                 }
@@ -82,7 +82,7 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
                         buttons: {
                             gotIt: {
                                 text: 'OK',
-                                keys:['enter']
+                                keys:['enter, esc']
                             }
                         }
                     });
@@ -110,7 +110,7 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
                 }
             }
         });
-    }
+    };
 
     /**
      * Clearing table cache
@@ -118,8 +118,6 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
      */
     $scope.clickClearTableCache = function (name) {
         console.log("Clearing table: " + name);
-
-        // $.confirm("123");
 
         $http.post("/api/frontEnd/clearTable", name)
             .then(function (response) {
@@ -146,12 +144,9 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
      */
     $scope.enableAutoRefreshTable = function () {
         var stop = $interval(function () {
-            console.log("inside");
             if (!$scope.enableAutoRefreshTableCheckbox) {
-                console.log("disabling");
                 $interval.cancel(stop);
             } else {
-                console.log("requesting");
                 $scope.getTables();
             }
         }, 1000);
@@ -272,4 +267,31 @@ app.directive("customSort", function () {
             };
         }// end link
     }
+});
+
+app.controller('getMonitoringContent', function ($scope, $filter, $http, $interval) {
+    $scope.metrics = [];
+
+    $scope.getMetrics = function () {
+        $http.get("/api/frontEnd/getMetrics")
+            .then(function (response) {
+                $scope.metrics = response.data;
+                // $scope.search();
+            });
+    };
+
+    /**
+     * Auto refreshing table with metrics
+     */
+    $scope.enableAutoRefreshTable = function () {
+        var stop = $interval(function () {
+            if (!$scope.enableAutoRefreshTableCheckbox) {
+                $interval.cancel(stop);
+            } else {
+                $scope.getMetrics();
+            }
+        }, 1000);
+    };
+
+    $scope.getMetrics();
 });

@@ -1,14 +1,19 @@
 package ru.sbt.util.HTTPDatapool.controllers;
 
+import com.sun.management.OperatingSystemMXBean;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.sbt.util.HTTPDatapool.connectionInterface.DBConnection;
+import ru.sbt.util.HTTPDatapool.controllers.dto.MetricsContainer;
 import ru.sbt.util.HTTPDatapool.controllers.dto.StatusContainer;
 import ru.sbt.util.HTTPDatapool.datapool.Datapool;
 
+import java.lang.management.ManagementFactory;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,8 +32,6 @@ public class FrontEndController {
 
     ExecutorService service = Executors.newFixedThreadPool(3);
 
-    //    private List<Map<String, String>> list = Stub.generateList(3);
-//    private List<Map<String, String>> list = dbConnection.getAllInfoAboutTablesInCache();
     private List<Map<String, String>> list = new ArrayList<>();
 
     /**
@@ -99,6 +102,13 @@ public class FrontEndController {
         return ResponseEntity.ok(list);
     }
 
+    /**
+     * Get status for specific table
+     *
+     * @param tableName - name of required table
+     * @return rs object with StatusContainer storing required data
+     */
+
     @PostMapping("/getStatus")
     public ResponseEntity<StatusContainer> getStatus(@RequestBody String tableName) {
 
@@ -111,7 +121,52 @@ public class FrontEndController {
             status = new StatusContainer("UPDATING", Double.toString(loadedPercent));
         }
 
-        log.info("getStatus was executed for table {}. Status is {}, percent is {}", tableName, status.getStatus(), status.getPercent());
+        log.debug("getStatus was executed for table {}. Status is {}, percent is {}", tableName, status.getStatus(), status.getPercent());
         return ResponseEntity.ok(status);
+    }
+
+    /**
+     * Get status for specific table
+     *
+     * @return rs object with StatusContainer storing required data
+     */
+
+    @GetMapping("/getMetrics")
+    public ResponseEntity<List<MetricsContainer>> getMetrics() {
+
+        OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
+        double processCpuLoad = new BigDecimal(osBean.getProcessCpuLoad() * 100).setScale(2, RoundingMode.UP).doubleValue();
+        double systemCpuLoad = new BigDecimal(osBean.getSystemCpuLoad() * 100).setScale(2, RoundingMode.UP).doubleValue();
+        double systemLoadAverage = new BigDecimal(osBean.getSystemLoadAverage()).setScale(2, RoundingMode.UP).doubleValue();
+
+        double totalPhysicalMemorySize = osBean.getTotalPhysicalMemorySize() / 1024 / 1024;
+        double freePhysicalMemorySize = osBean.getFreePhysicalMemorySize() / 1024 / 1024;
+
+        int availableProcessors = osBean.getAvailableProcessors();
+        String name = osBean.getName();
+        String arch = osBean.getArch();
+
+
+        List<MetricsContainer> list = new ArrayList<>();
+        if (processCpuLoad != -1)
+            list.add(new MetricsContainer("processCpuLoad", processCpuLoad + " %", "Утилизация CPU JVM"));
+        if (systemCpuLoad != -1)
+            list.add(new MetricsContainer("systemCpuLoad", systemCpuLoad + " %", "Утилизация CPU системой"));
+
+        if (systemLoadAverage != -1)
+            list.add(new MetricsContainer("systemLoadAverage", systemLoadAverage + " %", "-1 если не поддерживается"));
+
+        list.add(new MetricsContainer("totalPhysicalMemorySize)", totalPhysicalMemorySize + " MB", "Общее количество физической памяти"));
+        list.add(new MetricsContainer("freePhysicalMemorySize)", freePhysicalMemorySize + " MB", "Свободно физической памяти"));
+        list.add(new MetricsContainer("Xmx", Runtime.getRuntime().maxMemory() / 1024 / 1024 + " MB", "СЮДА НЕ СМОТРИМ"));
+
+        list.add(new MetricsContainer("availableProcessors", "" + availableProcessors, "Количество CPU"));
+        list.add(new MetricsContainer("ОС", "" + name, ""));
+        list.add(new MetricsContainer("Архитектура", "" + arch, ""));
+
+
+
+        log.debug("getMetrics was executed");
+        return ResponseEntity.ok(list);
     }
 }

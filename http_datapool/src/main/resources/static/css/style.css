@@ -112,7 +112,11 @@ h4{
 .row a{
     margin: 0;
 }
-
+.narrow{
+    width: 80%;
+    margin: 0 auto;
+    text-align: center;
+}
 /*
 === Old browser ===
 */
