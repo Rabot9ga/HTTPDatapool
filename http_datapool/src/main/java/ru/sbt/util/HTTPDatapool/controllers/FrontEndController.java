@@ -5,19 +5,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.web.bind.annotation.*;
 import ru.sbt.util.HTTPDatapool.connectionInterface.DBConnection;
 import ru.sbt.util.HTTPDatapool.controllers.dto.MetricsContainer;
 import ru.sbt.util.HTTPDatapool.controllers.dto.StatusContainer;
 import ru.sbt.util.HTTPDatapool.datapool.Datapool;
 
+import javax.annotation.PostConstruct;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
@@ -31,7 +34,13 @@ public class FrontEndController {
     @Autowired
     Datapool datapool;
 
-    ExecutorService service = Executors.newFixedThreadPool(3);
+    ThreadPoolExecutor service;
+
+    @PostConstruct
+    private void init(){
+        service = new ThreadPoolExecutor(5, 5, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new CustomizableThreadFactory("FrontUpdateThread"));
+        service.allowCoreThreadTimeOut(true);
+    }
 
     private List<Map<String, String>> list = new ArrayList<>();
 
