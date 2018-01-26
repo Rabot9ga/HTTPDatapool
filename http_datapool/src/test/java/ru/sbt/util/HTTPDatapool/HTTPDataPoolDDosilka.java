@@ -17,19 +17,19 @@ public class HTTPDataPoolDDosilka {
 
     private static List<Integer> TPSes = new ArrayList<>(100_000);
 
-    static int taskCount = 200;
+    static int taskCount = 500;
 
     public static void main(String[] args) throws InterruptedException {
 
 //        Callable<ParameterList> callable = () -> HttpParameter.getInstance("http://localhost:8080")
-        Callable<ParameterList> callable = () -> HttpParameter.getInstance("http://10.247.97.189:8080")
-                .addRequest("TABLE1", RequestType.RANDOM, "testScript123", "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4")
-//                .addRequest("TABLE2", RequestType.RANDOM, "testScript", "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4")
-//                .addRequest("TABLE3", RequestType.RANDOM, "testScript", "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4")
+        Callable<ParameterList> callable = () -> HttpParameter.getInstance("http://hpm74-07:8080/")
+                .addRequest("TABLE1", RequestType.RANDOM, "testScript", "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4")
+                .addRequest("TABLE2", RequestType.RANDOM, "testScript", "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4")
+                .addRequest("TABLE3", RequestType.RANDOM, "testScript", "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4")
                 .getParameters();
 
 
-        ThreadPoolExecutor LoaderService = (ThreadPoolExecutor) Executors.newFixedThreadPool(200);
+        ThreadPoolExecutor LoaderService = (ThreadPoolExecutor) Executors.newFixedThreadPool(500);
         ScheduledExecutorService TPSCounterService = Executors.newSingleThreadScheduledExecutor();
 
         for (int i = 0; i < taskCount; i++) {

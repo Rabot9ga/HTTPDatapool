@@ -7,6 +7,7 @@ import ru.sbt.util.HTTPDatapool.httpapi.RequestType;
 import ru.sbt.util.HTTPDatapool.paramsContainer.api.DataContainerAPI;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -33,16 +34,21 @@ public class TableContainer<T> {
                 && this.container.getRequestType() == parametersTable.getType();
     }
 
-    public T getDataOrElse(Supplier<List<T>> supplier) {
+    public Optional<T> getDataOrElse(Supplier<Optional<List<T>>> supplier) {
         if (container.getSize() <= 0) {
             synchronized (container) {
                 if (container.getSize() <= 0) {
-                    container.addTable(supplier.get());
+
+                    Optional<List<T>> dataFromCache = supplier.get();
+                    return dataFromCache.map(this::putDataReturnRow);
                 }
             }
         }
-        return container.getRow();
+        return Optional.of(container.getRow());
     }
 
-
+    private T putDataReturnRow(List<T> list){
+        container.addTable(list);
+        return container.getRow();
+    }
 }

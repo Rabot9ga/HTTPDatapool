@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.sbt.util.HTTPDatapool.connectionInterface.DBConnection;
+import ru.sbt.util.HTTPDatapool.connectionInterface.TablesCache;
 import ru.sbt.util.HTTPDatapool.httpapi.*;
 import ru.sbt.util.HTTPDatapool.paramsContainer.DataContainerFactory;
 
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class Datapool {
 
     @Autowired
-    DBConnection dbConnection;
+    TablesCache tablesCache;
 
     ConcurrentHashMap<ParametersTable, TableContainer<Map<String, Object>>> mapContainer = new ConcurrentHashMap<>();
 
@@ -61,15 +61,24 @@ public class Datapool {
     }
 
     private ResponseTables buildResponseTable(TableContainer<Map<String, Object>> tableContainer) {
+        Optional<Map<String, Object>> dataFromContainer = getDataFromContainer(tableContainer);
+        if (dataFromContainer.isPresent()) {
+            return ResponseTables.builder()
+                    .mapParameters(dataFromContainer.get())
+                    .status(Status.SUCCESS)
+                    .build();
+        }
+
         return ResponseTables.builder()
-                .mapParameters(getDataFromContainer(tableContainer))
-                .status(Status.SUCCESS)
+                .mapParameters(null)
+                .status(Status.BUSY)
                 .build();
+
     }
 
-    private Map<String, Object> getDataFromContainer(TableContainer<Map<String, Object>> tableContainer) {
+    private Optional<Map<String, Object>> getDataFromContainer(TableContainer<Map<String, Object>> tableContainer) {
         return tableContainer.getDataOrElse(
-                () -> dbConnection.getDataFromCache(
+                () -> tablesCache.getDataFromCache(
                         tableContainer.getTableName(),
                         tableContainer.getColumnsName()));
     }

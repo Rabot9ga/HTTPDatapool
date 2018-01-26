@@ -8,13 +8,14 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import ru.sbt.util.HTTPDatapool.connectionInterface.DBConnection;
+import ru.sbt.util.HTTPDatapool.connectionInterface.TablesCache;
 import ru.sbt.util.HTTPDatapool.httpapi.*;
 import ru.sbt.util.HTTPDatapool.paramsContainer.utils.Generator;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -26,14 +27,14 @@ public class DatapoolTest {
 
     private Datapool datapool;
     private HashSet<String> columns;
-    private DBConnection dbConnection;
+    private TablesCache tablesCache;
 
     private Map<String, List<Map<String, Object>>> tableMap;
 
     @BeforeTest
     public void setUp() throws Exception {
 
-        dbConnection = Mockito.mock(DBConnection.class);
+        tablesCache = Mockito.mock(TablesCache.class);
         columns = new HashSet<>();
         columns.add("123");
         columns.add("31");
@@ -45,10 +46,10 @@ public class DatapoolTest {
                 .collect(Collectors.toMap(o -> o.left, o -> o.right));
 
 
-        tableMap.forEach((key, value) -> when(dbConnection.getDataFromCache(key, columns)).thenReturn(tableMap.get(key)));
+        tableMap.forEach((key, value) -> when(tablesCache.getDataFromCache(key, columns)).thenReturn(Optional.of(tableMap.get(key))));
 
         datapool = new Datapool();
-        datapool.dbConnection = dbConnection;
+        datapool.tablesCache = tablesCache;
     }
 
     @DataProvider(name = "concurrentGetParameters", parallel = true)

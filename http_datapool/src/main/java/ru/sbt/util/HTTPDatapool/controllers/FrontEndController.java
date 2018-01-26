@@ -3,11 +3,11 @@ package ru.sbt.util.HTTPDatapool.controllers;
 import com.sun.management.OperatingSystemMXBean;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.web.bind.annotation.*;
-import ru.sbt.util.HTTPDatapool.connectionInterface.DBConnection;
+import ru.sbt.util.HTTPDatapool.connectionInterface.TablesCache;
+import ru.sbt.util.HTTPDatapool.controllers.dto.CacheTableInfo;
 import ru.sbt.util.HTTPDatapool.controllers.dto.MetricsContainer;
 import ru.sbt.util.HTTPDatapool.controllers.dto.StatusContainer;
 import ru.sbt.util.HTTPDatapool.datapool.Datapool;
@@ -17,11 +17,12 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @RestController
@@ -29,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FrontEndController {
 
     @Autowired
-    DBConnection dbConnection;
+    TablesCache tablesCache;
 
     @Autowired
     Datapool datapool;
@@ -42,7 +43,7 @@ public class FrontEndController {
         service.allowCoreThreadTimeOut(true);
     }
 
-    private List<Map<String, String>> list = new ArrayList<>();
+    private List<CacheTableInfo> list = new ArrayList<>();
 
     /**
      * Receiving list of tables in cache
@@ -50,9 +51,9 @@ public class FrontEndController {
      * @return all tables in cache
      */
     @GetMapping("/getTables")
-    public ResponseEntity<List<Map<String, String>>> getTables() {
+    public ResponseEntity<List<CacheTableInfo>> getTables() {
 
-        list = dbConnection.getAllInfoAboutTablesInCache();
+        list = tablesCache.getAllInfoAboutTablesInCache();
         log.info("getTables was executed! list is {}", list);
 
 
@@ -66,28 +67,19 @@ public class FrontEndController {
      * @return all tables in cache after delete
      */
     @PostMapping("/clearTable")
-    public ResponseEntity<List<Map<String, String>>> clearCache(@RequestBody String tableName) {
+    public ResponseEntity<List<CacheTableInfo>> clearCache(@RequestBody String tableName) {
         log.info("clearCache was executed for table {}", tableName);
 
-        //AtomicInteger is used to be wrapper over int. Otherwise it is impossible to change local variable from lambda
-        AtomicInteger indexToDelete = new AtomicInteger();
-
-        list.forEach(stringStringMap -> {
-            if (stringStringMap.get("name").equals(tableName)) {
-                indexToDelete.set(list.indexOf(stringStringMap));
-            }
-        });
-
-        dbConnection.clearCache(tableName);
+        tablesCache.clearCache(tableName);
         datapool.clearCache(tableName);
 
-        list = dbConnection.getAllInfoAboutTablesInCache();
+        list = tablesCache.getAllInfoAboutTablesInCache();
 
         return ResponseEntity.ok(list);
     }
 
     @PostMapping("/addTable")
-    public ResponseEntity<List<Map<String, String>>> addTable(@RequestBody String tableName) {
+    public ResponseEntity<List<CacheTableInfo>> addTable(@RequestBody String tableName) {
         log.debug("addTable was executed for table {}", tableName);
 
         /*
@@ -96,18 +88,19 @@ public class FrontEndController {
             3) Requesting its rowCount
          */
 
-        boolean tableExists = list.stream()
-                .map(map -> map.get("name"))
-                .anyMatch(s -> s.equals(tableName));
+//        boolean tableExists = list.stream()
+//                .map(map -> map.get("name"))
+//                .anyMatch(s -> s.equals(tableName));
+//
+//        if (tableExists) {
+//            log.error("trying to save existing table with name {}", tableName);
+//            return new ResponseEntity("Table already exists", HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
 
-        if (tableExists) {
-            log.error("trying to save existing table with name {}", tableName);
-            return new ResponseEntity("Table already exists", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
 
-        service.submit(() -> dbConnection.getDataFromCache(tableName, new HashSet<>(Collections.singletonList("*"))));
+        tablesCache.getDataFromCache(tableName, Collections.singleton("*"));
 
-        list = dbConnection.getAllInfoAboutTablesInCache();
+        list = tablesCache.getAllInfoAboutTablesInCache();
 
         return ResponseEntity.ok(list);
     }
@@ -123,7 +116,7 @@ public class FrontEndController {
     public ResponseEntity<StatusContainer> getStatus(@RequestBody String tableName) {
 
         StatusContainer status;
-        double loadedPercent = dbConnection.getLoadedPercent(tableName);
+        double loadedPercent = tablesCache.getLoadedPercent(tableName);
 
         if (loadedPercent == 100) {
             status = new StatusContainer("READY", Double.toString(loadedPercent));

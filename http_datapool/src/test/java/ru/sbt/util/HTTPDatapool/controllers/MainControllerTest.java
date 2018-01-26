@@ -16,7 +16,7 @@ import org.testng.annotations.Test;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
-import ru.sbt.util.HTTPDatapool.connectionInterface.DBConnection;
+import ru.sbt.util.HTTPDatapool.connectionInterface.TablesCache;
 import ru.sbt.util.HTTPDatapool.controllers.Interfaces.MainController;
 import ru.sbt.util.HTTPDatapool.httpapi.DatapoolRequest;
 import ru.sbt.util.HTTPDatapool.httpapi.DatapoolResponse;
@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -42,7 +43,7 @@ public class MainControllerTest extends AbstractTransactionalTestNGSpringContext
     private MainController mainController;
 
     @Autowired
-    private DBConnection dbConnection;
+    private TablesCache tablesCache;
 
     @BeforeClass
     public void setUp() throws Exception {
@@ -67,7 +68,7 @@ public class MainControllerTest extends AbstractTransactionalTestNGSpringContext
 
         String tableName = "FORTEST";
 
-        List<Map<String, Object>> dataFromCache = dbConnection.getDataFromCache(tableName, columns);
+        Optional<List<Map<String, Object>>> dataFromCache = tablesCache.getDataFromCache(tableName, columns);
 
         ParametersTable parametersTable = ParametersTable.builder()
                 .scriptName("FORTEST")
@@ -93,7 +94,7 @@ public class MainControllerTest extends AbstractTransactionalTestNGSpringContext
         DatapoolResponse datapoolResponse = response.body();
         log.info("DatapoolResponse: {}", datapoolResponse);
 
-        List<Map<String, String>> dataFromCacheConvert = dataFromCache.stream()
+        List<Map<String, String>> dataFromCacheConvert = dataFromCache.get().stream()
                 .map(this::convertMap)
                 .collect(Collectors.toList());
 

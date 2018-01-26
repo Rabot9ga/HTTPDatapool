@@ -1,14 +1,16 @@
 package ru.sbt.util.HTTPDatapool.connectionInterface;
 
+import ru.sbt.util.HTTPDatapool.controllers.dto.CacheTableInfo;
+
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 
-public interface DBConnection {
+public interface TablesCache {
 
-
-    List<Map<String, Object>> getDataFromCache(String tableName, Set<String> columnNames);
+    Optional<List<Map<String, Object>>> getDataFromCache(String tableName, Set<String> columnNames);
 
     void clearAllCaches();
 
@@ -20,10 +22,5 @@ public interface DBConnection {
 
     List<String> getAllTableNamesInCache();
 
-    List<String> getAllTableNamesInDB();
-
-    List<Map<String,String>> getAllInfoAboutTablesInCache();
-
-
-
+    List<CacheTableInfo> getAllInfoAboutTablesInCache();
 }
