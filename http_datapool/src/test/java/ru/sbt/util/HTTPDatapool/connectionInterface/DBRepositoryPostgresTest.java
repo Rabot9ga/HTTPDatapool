@@ -7,13 +7,13 @@ import org.springframework.test.context.testng.AbstractTransactionalTestNGSpring
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-@SpringBootTest(properties = "logging.level.ru.sbt.util.HTTPDatapool=debug")
+
 @Slf4j
-public class DBRepositoryTest extends AbstractTransactionalTestNGSpringContextTests {
+@SpringBootTest(properties = "logging.level.ru.sbt.util.HTTPDatapool=debug")
+public class DBRepositoryPostgresTest extends AbstractTransactionalTestNGSpringContextTests {
 
     @Autowired
     DBRepository dbRepository;
@@ -30,14 +30,13 @@ public class DBRepositoryTest extends AbstractTransactionalTestNGSpringContextTe
     public void testGetTableSize() throws Exception {
         int test_table = dbRepository.getTableSize("TEST_TABLE");
         log.debug("test_table.size = {}", test_table);
-        Assert.assertEquals(test_table, 677459);
+        Assert.assertEquals(test_table, 11291692);
     }
 
     @Test
     public void testGetAllTableNamesInDB() throws Exception {
-        String[] names = {"ID_FIO_DOC_INDIVIDUAL", "FORTEST", "TEST_TABLE", "TABLE1", "TABLE2", "TABLE3"};
         List<String> namesInDB = dbRepository.getAllTableNamesInDB();
-        log.debug("Table names in DB: {}", namesInDB);
-        Assert.assertTrue(namesInDB.containsAll(Arrays.asList(names)));
+        namesInDB.forEach(s -> log.debug("name = {}", s));
+        Assert.assertTrue(namesInDB.size() > 0);
     }
 }

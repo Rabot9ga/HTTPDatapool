@@ -10,13 +10,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
-import ru.sbt.util.HTTPDatapool.connectionInterface.TablesCache;
+import ru.sbt.util.HTTPDatapool.connectionInterface.DBRepository;
 import ru.sbt.util.HTTPDatapool.controllers.Interfaces.MainController;
 import ru.sbt.util.HTTPDatapool.httpapi.DatapoolRequest;
 import ru.sbt.util.HTTPDatapool.httpapi.DatapoolResponse;
@@ -27,7 +26,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -43,7 +41,7 @@ public class MainControllerTest extends AbstractTransactionalTestNGSpringContext
     private MainController mainController;
 
     @Autowired
-    private TablesCache tablesCache;
+    private DBRepository dbRepository;
 
     @BeforeClass
     public void setUp() throws Exception {
@@ -68,7 +66,8 @@ public class MainControllerTest extends AbstractTransactionalTestNGSpringContext
 
         String tableName = "FORTEST";
 
-        Optional<List<Map<String, Object>>> dataFromCache = tablesCache.getDataFromCache(tableName, columns);
+        int tableSize = dbRepository.getTableSize(tableName);
+        List<Map<String, Object>> dataFromTable = dbRepository.getFromTableBetween(tableName, 1, tableSize);
 
         ParametersTable parametersTable = ParametersTable.builder()
                 .scriptName("FORTEST")
@@ -86,21 +85,27 @@ public class MainControllerTest extends AbstractTransactionalTestNGSpringContext
         log.info("=======================================================");
         log.info("Columns Name: {}", columns);
         log.info("TableName: {}", tableName);
-        log.info("DataFromCache: {}", dataFromCache);
+        log.info("DataFromTable: {}", dataFromTable);
         log.info("DatapoolRequest: {}", request);
 
         Response<DatapoolResponse> response = mainController.getParameter(request).execute();
 
+        int code = response.code();
+        log.info("response.code() = {}", code);
+
         DatapoolResponse datapoolResponse = response.body();
         log.info("DatapoolResponse: {}", datapoolResponse);
 
-        List<Map<String, String>> dataFromCacheConvert = dataFromCache.get().stream()
-                .map(this::convertMap)
-                .collect(Collectors.toList());
+
+//        boolean statusBusy = datapoolResponse.getResponseTablesStream().anyMatch(entry -> entry.getValue().getStatus().equals(Status.BUSY));
 
 
+//        List<Map<String, String>> dataFromCacheConvert = dataFromCache.get().stream()
+//                .map(this::convertMap)
+//                .collect(Collectors.toList());
 
-        datapoolResponse.getResponseTables().forEach((parametersTable1, responseTables) -> Assert.assertTrue(dataFromCacheConvert.contains(convertMap(responseTables.getMapParameters()))));
+
+//        datapoolResponse.getResponseTables().forEach((parametersTable1, responseTables) -> Assert.assertTrue(dataFromCacheConvert.contains(convertMap(responseTables.getMapParameters()))));
 
 
         log.info("=======================================================");

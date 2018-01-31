@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Repository
 @Slf4j
-public class DataRepository implements TablesCache {
+public class TablesCacheImpl implements TablesCache {
 
     @Autowired
     @Setter

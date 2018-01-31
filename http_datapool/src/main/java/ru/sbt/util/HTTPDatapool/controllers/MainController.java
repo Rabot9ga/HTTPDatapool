@@ -27,6 +27,7 @@ public class MainController {
         DatapoolResponse parameters = datapool.getParameters(datapoolRequest);
 
         log.debug("return parameters: {}", parameters);
+
         return ResponseEntity.ok(parameters);
     }
 }

@@ -44,8 +44,9 @@ public class MainControllerTest extends AbstractTransactionalTestNGSpringContext
                 .getParameters();
 
 
-        List<Future<ParameterList>> collect = IntStream.range(0, 100000).mapToObj(value -> service.submit(callable)).collect(Collectors.toList());
+        List<Future<ParameterList>> collect = IntStream.range(0, 10).mapToObj(value -> service.submit(callable)).collect(Collectors.toList());
 
+        Thread.sleep(100);
         for (Future<ParameterList> parameterListFuture : collect) {
             ParameterList parameterList = null;
             try {

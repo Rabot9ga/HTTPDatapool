@@ -25,6 +25,8 @@ public class Datapool {
 
     public DatapoolResponse getParameters(DatapoolRequest datapoolRequest) {
 
+        // TODO: 31.01.2018 Проверка на то что таблица существует
+
         Map<ParametersTable, ResponseTables> responseMap = datapoolRequest.getParametersTablesStream()
                 .map(parametersTable -> Pair.of(parametersTable, Optional.ofNullable(mapContainer.get(parametersTable))))
                 .map(pair -> Pair.of(pair.getLeft(), pair.getRight().orElseGet(() -> createTableContainer(pair.getLeft()))))
@@ -62,17 +64,17 @@ public class Datapool {
 
     private ResponseTables buildResponseTable(TableContainer<Map<String, Object>> tableContainer) {
         Optional<Map<String, Object>> dataFromContainer = getDataFromContainer(tableContainer);
-        if (dataFromContainer.isPresent()) {
-            return ResponseTables.builder()
-                    .mapParameters(dataFromContainer.get())
-                    .status(Status.SUCCESS)
-                    .build();
-        }
 
-        return ResponseTables.builder()
-                .mapParameters(null)
-                .status(Status.BUSY)
-                .build();
+        return dataFromContainer
+                .map(map -> ResponseTables.builder()
+                        .mapParameters(map)
+                        .status(Status.SUCCESS)
+                        .build())
+
+                .orElse(ResponseTables.builder()
+                        .mapParameters(null)
+                        .status(Status.BUSY)
+                        .build());
 
     }
 
