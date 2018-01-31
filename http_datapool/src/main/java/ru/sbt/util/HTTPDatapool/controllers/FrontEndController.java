@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.web.bind.annotation.*;
+import ru.sbt.util.HTTPDatapool.connectionInterface.DBRepository;
 import ru.sbt.util.HTTPDatapool.connectionInterface.TablesCache;
 import ru.sbt.util.HTTPDatapool.controllers.dto.CacheTableInfo;
 import ru.sbt.util.HTTPDatapool.controllers.dto.MetricsContainer;
@@ -34,6 +35,9 @@ public class FrontEndController {
 
     @Autowired
     Datapool datapool;
+
+    @Autowired
+    DBRepository dbRepository;
 
     ThreadPoolExecutor service;
 
@@ -88,16 +92,6 @@ public class FrontEndController {
             3) Requesting its rowCount
          */
 
-//        boolean tableExists = list.stream()
-//                .map(map -> map.get("name"))
-//                .anyMatch(s -> s.equals(tableName));
-//
-//        if (tableExists) {
-//            log.error("trying to save existing table with name {}", tableName);
-//            return new ResponseEntity("Table already exists", HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-
-
         tablesCache.getDataFromCache(tableName, Collections.singleton("*"));
 
         list = tablesCache.getAllInfoAboutTablesInCache();
@@ -137,8 +131,11 @@ public class FrontEndController {
 
     @GetMapping("/getTableListInDB")
     public ResponseEntity<List<String>> getTableListInDB() {
-        log.debug("getTableListInDB was executed. Returned list is {}", dbConnection.getAllTableNamesInDB());
-        return ResponseEntity.ok(dbConnection.getAllTableNamesInDB());
+
+        List<String> allTableNamesInDB = dbRepository.getAllTableNamesInDB();
+        log.debug("getTableListInDB was executed. Returned list is {}", allTableNamesInDB);
+
+        return ResponseEntity.ok(allTableNamesInDB);
     }
 
 
