@@ -10,33 +10,49 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Script for loading HTTPDataPool application with specified number of threads and requests located on specified host
+ *
+ * Usage:
+ *
+ * 1) Build jar
+ * 2) java -jar DDosilka-<version> <hostname> <number of Threads> <number of requests for every Thread>
+ *
+ */
+
 public class HTTPDataPoolDDosilka {
 
     static AtomicInteger ai = new AtomicInteger();
     static AtomicInteger aiPrev = new AtomicInteger(ai.get());
 
-    private static List<Integer> TPSes = new ArrayList<>(100_000);
+    private static List<Integer> TPSes = new ArrayList<>(1000);
 
-    static int taskCount = 500;
+
 
     public static void main(String[] args) throws InterruptedException {
 
-//        Callable<ParameterList> callable = () -> HttpParameter.getInstance("http://localhost:8080")
-        Callable<ParameterList> callable = () -> HttpParameter.getInstance("http://hpm74-07:8080/")
-                .addRequest("TABLE1", RequestType.RANDOM, "testScript", "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4")
-                .addRequest("TABLE2", RequestType.RANDOM, "testScript", "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4")
-                .addRequest("TABLE3", RequestType.RANDOM, "testScript", "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4")
+        System.out.println("Requesting host: " + args[0] + " with " + args[1] + " threads. Tasks per Thread: " + args[2]);
+        System.out.println("Requesting Table: " + args[3] + ". Requested column is " + args[4]);
+
+        int taskCount = Integer.parseInt(args[1]);
+
+        Callable<ParameterList> callable = () -> HttpParameter.getInstance("http://" + args[0] + ":8080")
+                .addRequest(args[3], RequestType.RANDOM, "testScript123", "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4")
+//                .addRequest("TABLE2", RequestType.RANDOM, "testScript", "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4")
+//                .addRequest("TABLE3", RequestType.RANDOM, "testScript", "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4")
                 .getParameters();
 
 
-        ThreadPoolExecutor LoaderService = (ThreadPoolExecutor) Executors.newFixedThreadPool(500);
+        ThreadPoolExecutor LoaderService = (ThreadPoolExecutor) Executors.newCachedThreadPool();
         ScheduledExecutorService TPSCounterService = Executors.newSingleThreadScheduledExecutor();
+
+        int tasks = Integer.parseInt(args[2]);
 
         for (int i = 0; i < taskCount; i++) {
             LoaderService.submit(() -> {
-                for (int j = 0; j < 10_000; j++) {
+                for (int j = 0; j < tasks; j++) {
                     try {
-                        callable.call().getRequestValue(0).get("COLUMN1");
+                        callable.call().getRequestValue(0).get(args[4]);
                         ai.incrementAndGet();
 //                        callable.call().getRequestValue(0).get("COLUMN2");
 //                        callable.call().getRequestValue(0).get("COLUMN3");
@@ -65,7 +81,6 @@ public class HTTPDataPoolDDosilka {
                 TPSCounterService.shutdown();
                 CalculateStats(TPSes);
             }
-//            System.out.println("LoaderService.getCompletedTaskCount() = " + LoaderService.getCompletedTaskCount());
             TimeUnit.SECONDS.sleep(2);
         }
 

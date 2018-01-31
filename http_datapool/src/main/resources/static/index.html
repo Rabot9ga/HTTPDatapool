@@ -17,6 +17,9 @@
     <link href="css/bootstrap.no-icons.min.css" rel="stylesheet">
 
     <link href="css/style.css" rel="stylesheet">
+
+    <link href="css/jquery.autocomplete.css" rel="stylesheet">
+
     <script src="js/angular.min.js"></script>
     <script src="js/starter.js"></script>
 </head>
@@ -24,18 +27,19 @@
 <header class="wrapper">
     <img src="MDB/img/dblogo.png" style="height: 60px;"/>
     <h3>HTTPDataPool</h3>
+    <span class="small">v0.5</span>
 </header>
 <!-- Nav tabs -->
 <div class="tabs-wrapper tabs-cyan">
     <ul class="nav classic-tabs wrapper" role="tablist">
         <li class="nav-item">
-            <a class="nav-link waves-light active" data-toggle="tab" href="#panel1" role="tab"><i class="fa fa-list" aria-hidden="true"></i>Операции с кэшем</a>
+            <a class="nav-link waves-light active" data-toggle="tab" href="#panel1" role="tab"><i class="fa fa-list" aria-hidden="true"></i> Операции с кэшем</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link waves-light" data-toggle="tab" href="#panel2" role="tab"><i class="fa fa-bar-chart" aria-hidden="true"></i>Мониторинг</a>
+            <a class="nav-link waves-light" data-toggle="tab" href="#panel2" role="tab"><i class="fa fa-bar-chart" aria-hidden="true"></i> Мониторинг</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link waves-light" data-toggle="tab" href="#panel3" role="tab"><i class="fa fa-user-o" aria-hidden="true"></i>Кто это накостылил?</a>
+            <a class="nav-link waves-light" data-toggle="tab" href="#panel3" role="tab"><i class="fa fa-user-o" aria-hidden="true"></i> Кто это накостылил?</a>
         </li>
     </ul>
 </div>
@@ -51,11 +55,20 @@
                     <div class="col-xs-2 search-line">
                         <span class="h6 mx-5">Добавить таблицу:</span>
                     </div>
-                    <div class="col-sm-5 search-line">
-                        <input type="text" class="input-large search-query" ng-model="post.tableToAdd" placeholder="Имя таблицы" ng-keydown="$event.keyCode === 13 && addTableCache(post.tableToAdd)"/>
+                    <div class="col-sm-5 search-line" >
+                        <input id="tableToAddInput" type="text" ng-mousedown="updateTablesInDBSuggestionsList()" class="input-large search-query" ng-model="tableToAdd" ng-model-options="{updateOn: 'keyup'}" name="tableToAdd" placeholder="Имя таблицы"
+                               ng-keypress="checkIfEnterWasPressed($event)" >
+                               <!--ng-keydown="$event.keyCode === 13 && addTableCache(tableToAdd)"/>-->
+                               <!--&lt;!&ndash;ng-keydown="$event.keyCode === 13 && addTableCache(tableToAdd)"/>&ndash;&gt;-->
+
+
+                        <!--<div id="add-suggestions-block">-->
+                            <!--<li class="suggestion-row" ng-click="fillTableAddInput(table)" ng-repeat="table in (tablesInDB)" ng-bind="table"></li>-->
+                            <!--&lt;!&ndash;<li class="suggestion-row" ng-click="fillTableAddInput(table)" ng-repeat="table in (tablesInDB | filter:showTablesInDBSuggestions)" ng-bind="table"></li>&ndash;&gt;-->
+                        <!--</div>-->
                     </div>
                     <div class="col-md-2 search-line">
-                        <a href ng-click="addTableCache(post.tableToAdd)" class="btn btn-info waves-effect waves-light"
+                        <a href ng-click="addTableCache(tableToAdd)" class="btn btn-info waves-effect waves-light"
                                role="button">Добавить <i class="fa fa-plus" aria-hidden="true"></i></a>
                     </div>
                 </div>
@@ -81,9 +94,8 @@
             <table class="table table-striped table-condensed table-hover">
                 <thead>
                 <tr>
-                    <th class="id" custom-sort order="'id'" sort="sort">Id&nbsp;</th>
-                    <th class="name" custom-sort order="'name'" sort="sort">Имя таблицы&nbsp;</th>
-                    <th class="rowCount" custom-sort order="'rowCount'" sort="sort">Кол-во строк&nbsp;</th>
+                    <th class="name" custom-sort order="'name'" sort="sort">Имя таблицы</th>
+                    <th class="rowCount" custom-sort order="'rowCount'" sort="sort">Кол-во строк</th>
                     <th class="tableStatus" colspan="2">Статус</th>
                     <th class="clearTable">Очистить таблицу</th>
                 </tr>
@@ -116,7 +128,6 @@
                 </tfoot>
                 <tbody>
                 <tr ng-repeat="item in pagedItems[currentPage] | orderBy:sort.sortingOrder:sort.reverse">
-                    <td>{{item.id}}</td>
                     <td>{{item.name}}</td>
                     <td>{{item.rowCount}}</td>
                     <td>{{item.status}}</td>
@@ -131,6 +142,11 @@
                                 data-ng-disabled="isTableAddingStatus(item.status)"
                                 class="btnClearTable btn btn-danger ">
                             <i class='fa fa-trash' area-hidden="true"></i>
+                        </button>
+                        <button href ng-click="confirmUpdateTableCache(item.name)"
+                                data-ng-disabled="isTableAddingStatus(item.status)"
+                                class="btnUpdateTable btn btn-danger ">
+                            <i class='fa fa-refresh' area-hidden="true"></i>
                         </button>
                     </td>
                 </tr>
@@ -151,23 +167,59 @@
                     <input type="checkbox" ng-model="enableAutoRefreshTableCheckbox" ng-change="enableAutoRefreshTable()" class="input-small">
                 </div>
             </div>
-            <div class="add-block border border-success rounded">
-                <table class="table table-striped table-condensed table-hover">
-                    <thead>
-                    <tr>
-                        <th class="id">Метрика</th>
-                        <th class="name">Значение</th>
-                        <th class="info">Описание</th>
-                    </tr>
-                    </thead>
-                    <tfoot>
-                        <tr ng-repeat="item in metrics">
-                            <td>{{item.name}}</td>
-                            <td>{{item.value}}</td>
-                            <td>{{item.info}}</td>
-                        </tr>
-                    </tfoot>
-                </table>
+
+
+            <div class="tabs-wrapper tabs-grey mt-3">
+                <ul class="nav classic-tabs wrapper" role="tablist2">
+                    <li class="nav-item">
+                        <a class="nav-link waves-light active" data-toggle="tab" href="#General" role="tab"><i class="fa fa-list" aria-hidden="true"></i> General</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link waves-light" data-toggle="tab" href="#Heap_nonHeap" role="tab"><i class="fa fa-bar-chart" aria-hidden="true"></i> Heap_nonHeap</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="tab-content card console ">
+                <div class="tab-pane fade in show active wrapper" id="General" role="tabpanel">
+                    <h3>General</h3>
+                    <div class="add-block border border-success rounded">
+                        <table class="table table-striped table-condensed table-hover">
+                            <thead>
+                            <tr>
+                                <th class="id">Метрика</th>
+                                <th class="name">Значение</th>
+                                <th class="info">Описание</th>
+                            </tr>
+                            </thead>
+                            <tfoot>
+                            <tr ng-if="item.category === 'General'" ng-repeat="item in metrics">
+                                <td>{{item.info}}</td>
+                                <td>{{item.value}}</td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane fade in show wrapper" id="Heap_nonHeap" role="tabpanel">
+                    <h3>Heap / nonHeap</h3>
+                    <div class="add-block border border-success rounded">
+                        <table class="table table-striped table-condensed table-hover">
+                            <thead>
+                            <tr>
+                                <th class="id">Метрика</th>
+                                <th class="name">Значение</th>
+                                <th class="info">Описание</th>
+                            </tr>
+                            </thead>
+                            <tfoot>
+                            <tr ng-if="item.category === 'Heap_nonHeap'" ng-repeat="item in metrics">
+                                <td>{{item.info}}</td>
+                                <td>{{item.value}}</td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -189,6 +241,8 @@
     <script type="text/javascript" src="MDB/js/mdb.js"></script>
     <script type="text/javascript" src="js/jquery-confirm.min.js"></script>
     <script type="text/javascript" src="js/Main.js"></script>
+    <script type="text/javascript" src="js/jquery.autocomplete.js"></script>
+
 </footer>
 </body>
 </html>

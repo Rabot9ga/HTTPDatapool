@@ -35,6 +35,31 @@ h4{
     color:green;
 }
 
+/*
+=== Suggestions block ===
+*/
+
+#add-suggestions-block{
+    position: absolute;
+    width: 430px;
+    margin: 0 10px;
+    padding: 0 14px;
+    z-index: 1;
+}
+
+#add-suggestions-block li{
+    list-style-type: none;
+    background-color: #B3E5FC;
+    width: 100%;
+    padding: 5px 10px;
+}
+#add-suggestions-block li:hover {
+    background-color: #0e90d2;
+    cursor: pointer;
+    color: white;
+}
+
+
 .fa-spinner.statusIcon{
 }
 
@@ -52,6 +77,16 @@ h4{
     transform: scale(1.2,1.2);
 }
 
+.btn-transparent{
+    background-color: #ecf0f1 !important;
+}
+
+.btn-cyan{
+    background-color:#30cfc0 !important;
+}
+
+
+
 .tableStatus{
     text-align: center !important;
 }
@@ -65,6 +100,9 @@ h4{
 */
 .tabs-cyan {
     background-color: #33b5e5;;
+}
+.tabs-grey {
+    background-color: #546e7a;
 }
 .classic-tabs li a.active {
     border-bottom: 3px solid #F00;

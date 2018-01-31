@@ -128,6 +128,20 @@ public class FrontEndController {
         return ResponseEntity.ok(status);
     }
 
+
+    /**
+     * Get list of tables in DB available for downloading to cache
+     *
+     * @return rs object with list of tables in database
+     */
+
+    @GetMapping("/getTableListInDB")
+    public ResponseEntity<List<String>> getTableListInDB() {
+        log.debug("getTableListInDB was executed. Returned list is {}", dbConnection.getAllTableNamesInDB());
+        return ResponseEntity.ok(dbConnection.getAllTableNamesInDB());
+    }
+
+
     /**
      * Get status for specific table
      *
@@ -145,39 +159,28 @@ public class FrontEndController {
         double totalPhysicalMemorySize = osBean.getTotalPhysicalMemorySize() / 1024 / 1024;
         double freePhysicalMemorySize = osBean.getFreePhysicalMemorySize() / 1024 / 1024;
 
-        int availableProcessors = osBean.getAvailableProcessors();
-        String name = osBean.getName();
-        String arch = osBean.getArch();
-
         MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
 
         List<MetricsContainer> list = new ArrayList<>();
         if (processCpuLoad != -1)
-            list.add(new MetricsContainer("processCpuLoad", processCpuLoad + " %", "Утилизация CPU JVM"));
+            list.add(new MetricsContainer("General", "processCpuLoad", processCpuLoad + " %", "Утилизация CPU JVM"));
         if (systemCpuLoad != -1)
-            list.add(new MetricsContainer("systemCpuLoad", systemCpuLoad + " %", "Утилизация CPU системой"));
-
+            list.add(new MetricsContainer("General", "systemCpuLoad", systemCpuLoad + " %", "Утилизация CPU системой"));
         if (systemLoadAverage != -1)
-            list.add(new MetricsContainer("systemLoadAverage", systemLoadAverage + " %", "-1 если не поддерживается"));
+            list.add(new MetricsContainer("General", "systemLoadAverage", systemLoadAverage + " %", "-1 если не поддерживается"));
+        list.add(new MetricsContainer("General", "ОС", "" + osBean.getName(), "Операционная система"));
+        list.add(new MetricsContainer("General", "Архитектура", "" + osBean.getArch(), "Архитектура ОС"));
+        list.add(new MetricsContainer("General", "availableProcessors", "" + osBean.getAvailableProcessors(), "Количество CPU"));
 
-        list.add(new MetricsContainer("totalPhysicalMemorySize", totalPhysicalMemorySize + " MB", "Общее количество физической памяти"));
-        list.add(new MetricsContainer("freePhysicalMemorySize", freePhysicalMemorySize + " MB", "Свободно физической памяти"));
-        list.add(new MetricsContainer("Xmx", Runtime.getRuntime().maxMemory() / 1024 / 1024 + " MB", "СЮДА НЕ СМОТРИМ"));
-        list.add(new MetricsContainer("freeMemory", Runtime.getRuntime().freeMemory() / 1024 / 1024 + " MB", "Доступно памяти для JVM"));
+        list.add(new MetricsContainer("Heap_nonHeap", "totalPhysicalMemorySize", totalPhysicalMemorySize + " MB", "Общее количество физической памяти"));
+        list.add(new MetricsContainer("Heap_nonHeap", "freePhysicalMemorySize", freePhysicalMemorySize + " MB", "Свободно физической памяти"));
+        list.add(new MetricsContainer("Heap_nonHeap", "freeMemory", Runtime.getRuntime().freeMemory() / 1024 / 1024 + " MB", "Доступно памяти для JVM"));
 
-        list.add(new MetricsContainer("", "" , ""));
-        list.add(new MetricsContainer("Heap Max", memoryMXBean.getHeapMemoryUsage().getMax() / 1024 / 1024 + " MB" , ""));
-        list.add(new MetricsContainer("Heap Committed", memoryMXBean.getHeapMemoryUsage().getCommitted() / 1024 / 1024 + " MB" , ""));
-        list.add(new MetricsContainer("Heap Used", memoryMXBean.getHeapMemoryUsage().getUsed() / 1024 / 1024 + " MB" , ""));
-        list.add(new MetricsContainer("nonHeap Committed", memoryMXBean.getNonHeapMemoryUsage().getCommitted() / 1024 / 1024 + " MB" , ""));
-        list.add(new MetricsContainer("nonHeap Used", memoryMXBean.getNonHeapMemoryUsage().getUsed() / 1024 / 1024 + " MB" , ""));
-        list.add(new MetricsContainer("", "" , ""));
-
-        list.add(new MetricsContainer("ОС", "" + name, ""));
-        list.add(new MetricsContainer("Архитектура", "" + arch, ""));
-        list.add(new MetricsContainer("availableProcessors", "" + availableProcessors, "Количество CPU"));
-
-
+        list.add(new MetricsContainer("Heap_nonHeap", "Heap Max", memoryMXBean.getHeapMemoryUsage().getMax() / 1024 / 1024 + " MB", "Heap Max (Xmx)"));
+        list.add(new MetricsContainer("Heap_nonHeap", "Heap Committed", memoryMXBean.getHeapMemoryUsage().getCommitted() / 1024 / 1024 + " MB", "Heap Committed"));
+        list.add(new MetricsContainer("Heap_nonHeap", "Heap Used", memoryMXBean.getHeapMemoryUsage().getUsed() / 1024 / 1024 + " MB", "Heap Used"));
+        list.add(new MetricsContainer("Heap_nonHeap", "nonHeap Committed", memoryMXBean.getNonHeapMemoryUsage().getCommitted() / 1024 / 1024 + " MB", "nonHeap Committed"));
+        list.add(new MetricsContainer("Heap_nonHeap", "nonHeap Used", memoryMXBean.getNonHeapMemoryUsage().getUsed() / 1024 / 1024 + " MB", "nonHeap Used"));
 
         log.debug("getMetrics was executed");
         return ResponseEntity.ok(list);
