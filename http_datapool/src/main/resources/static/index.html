@@ -121,7 +121,6 @@
                                 ng-show="pagedItems.length > 5" ng-click="setPage(pagedItems.length-1)">
                                 <a href>»</a>
                             </li>
-
                         </ul>
                     </div>
                 </td>
@@ -132,7 +131,7 @@
                     <td>{{item.rowCount}}</td>
                     <td>{{item.status}}</td>
                     <td>
-                        {{item.progress | number:2}}%
+                        {{item.progressDownload * 100 | number:2}}%
                         <i ng-if="item.status == 'READY'" class="fa fa-check fa-lg statusIcon" area-hidden="true"></i>
                         <i ng-if="item.status == 'UPDATING'" class="fa fa-spinner fa-spin fa-lg statusIcon"
                            area-hidden="true"></i>
