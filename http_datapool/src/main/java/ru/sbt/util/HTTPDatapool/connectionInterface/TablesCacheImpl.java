@@ -98,7 +98,15 @@ public class TablesCacheImpl implements TablesCache {
     }
 
     private CacheTableInfo createCacheTableInfo(Map.Entry<String, TableDownloader> entry) {
-        AddingStatus status = entry.getValue().getDownloadProgress() < 1 ? AddingStatus.UPDATING : AddingStatus.READY;
+        AddingStatus status;
+        double downloadProgress = entry.getValue().getDownloadProgress();
+        if (downloadProgress == 0) {
+            status = AddingStatus.NEW;
+        } else if (downloadProgress == 1) {
+            status = AddingStatus.READY;
+        } else {
+            status = AddingStatus.UPDATING;
+        }
 
         return CacheTableInfo.builder()
                 .name(entry.getKey())
