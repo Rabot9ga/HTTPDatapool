@@ -14,7 +14,7 @@ import java.util.Optional;
 @SpringBootTest(properties = "logging.level.ru.sbt.util.HTTPDatapool=debug")
 @Slf4j
 public class TablesCacheTest extends AbstractTransactionalTestNGSpringContextTests {
-
+    // TODO: 31.01.2018 Дописать тесты
     @Autowired
     TablesCache tablesCache;
 
@@ -29,10 +29,12 @@ public class TablesCacheTest extends AbstractTransactionalTestNGSpringContextTes
 
     @Test
     public void testClearAllCaches() throws Exception {
+
     }
 
     @Test
     public void testClearCache() throws Exception {
+        // TODO: 31.01.2018 правильно проверить очистку кешей
     }
 
     @Test

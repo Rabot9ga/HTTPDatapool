@@ -1,5 +1,6 @@
 package ru.sbt.util.HTTPDatapool.connectionInterface;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
@@ -17,12 +18,19 @@ public class TableDownloader {
     private ConcurrentHashMap<String, List<Map<String, Object>>> cache;
     private ExecutorService service;
     private DBRepository dbRepository;
+    @Getter
     private String tableName;
+    @Getter
     private int countRows;
+    @Getter
     private int countRowsOneSelect;
-
+    @Getter
     private int taskCount;
+    @Getter
     private Map<String, Object>[] tmpLines;
+    @Getter
+    private ArrayList<CompletableFuture<Void>> futures;
+    private volatile boolean abortedDownload;
 
     public TableDownloader(ConcurrentHashMap<String, List<Map<String, Object>>> cache, ExecutorService service, DBRepository dbRepository, String tableName, int countRowsOneSelect) {
         this.cache = cache;
@@ -40,23 +48,38 @@ public class TableDownloader {
         tmpLines = new Map[countRows];
         taskCount = countRows / countRowsOneSelect + 1;
 
+
+        futures = new ArrayList<>();
+
         for (int i = 0; i < taskCount; i++) {
             int from = i * countRowsOneSelect + 1;
             int to = (i + 1) * countRowsOneSelect;
 
-            CompletableFuture.supplyAsync(() -> dbRepository.getFromTableBetween(tableName, from, to), service)
+            CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> dbRepository.getFromTableBetween(tableName, from, to), service)
                     .exceptionally(throwable -> exceptionally(tableName, from, to, throwable))
                     .thenAccept(list -> putValue(list, from, tableName));
+
+            futures.add(future);
         }
     }
 
-    public double getDownloadProgress() {
-        int passCount = passCountFuture.get();
-        int failCount = failCountFuture.get();
-        return (double) (passCount + failCount) / (double) taskCount;
+    public void deleteFromCache() {
+        futures.stream()
+                .filter(future -> !future.isDone())
+                .forEach(future -> future.cancel(false));
+        abortedDownload = true;
     }
 
-    public int getDowloadedRowCount(){
+    public double getDownloadProgress() {
+        if (!abortedDownload) {
+            int passCount = passCountFuture.get();
+            int failCount = failCountFuture.get();
+            return (double) (passCount + failCount) / (double) taskCount;
+        }
+        return -1.0;
+    }
+
+    public int getDowloadedRowCount() {
         int passCount = passCountFuture.get();
         return passCount * countRowsOneSelect;
     }
