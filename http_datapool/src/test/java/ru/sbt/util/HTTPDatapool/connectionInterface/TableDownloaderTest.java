@@ -1,6 +1,7 @@
 package ru.sbt.util.HTTPDatapool.connectionInterface;
 
 import lombok.extern.slf4j.Slf4j;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -89,5 +90,15 @@ public class TableDownloaderTest {
         log.debug("dowloadedRowCount1: {}", dowloadedRowCount1);
 
         assertNotEquals(dowloadedRowCount, dowloadedRowCount1);
+    }
+
+    @Test
+    public void testDeleteCache() throws Exception {
+        downloader.putInCache();
+        downloader.deleteFromCache();
+        log.debug("futures: {}", downloader.getFutures());
+        log.debug("downloader.getDownloadProgress() = {}", downloader.getDownloadProgress());
+        Assert.assertTrue(downloader.getFutures().stream().allMatch(future -> future.isCancelled() || future.isDone()));
+        Assert.assertEquals(downloader.getDownloadProgress(), -1.0);
     }
 }
