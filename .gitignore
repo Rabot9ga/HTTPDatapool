@@ -26,7 +26,6 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
-/gradle.properties
 http_datapool/src/main/java/ru/sbt/util/HTTPDatapool/repository/
 http_datapool/src/main/resources/templates/
 http_datapool/src/test/resources/
