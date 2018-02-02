@@ -40,7 +40,7 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.apache.commons:commons-lang3:3.6')
 //    runtime('com.h2database:h2:1.4.196')
-    compile project(':httpapi')
+    compile project(':http_dto')
     runtime('org.springframework.boot:spring-boot-devtools')
 //    runtime('com.oracle.jdbc:ojdbc7:12.1.0.2')
     runtime('org.postgresql:postgresql')

@@ -85,7 +85,7 @@ public class TableDownloader {
     }
 
     private void putValue(List<Map<String, Object>> list, int from, String tableName) {
-        int i = from;
+        int i = from - 1;
         for (Map<String, Object> stringObjectMap : list) {
             tmpLines[i] = stringObjectMap;
             ++i;
@@ -102,7 +102,7 @@ public class TableDownloader {
             List<Map<String, Object>> listMap;
             if (failCount > 0) {
                 listMap = Arrays.stream(tmpLines)
-                        .filter(Objects::isNull)
+                        .filter(Objects::nonNull)
                         .collect(Collectors.toList());
             } else {
                 listMap = Arrays.asList(tmpLines);

@@ -5,7 +5,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.sbt.util.HTTPDatapool.connectionInterface.TablesCache;
-import ru.sbt.util.HTTPDatapool.httpapi.*;
+import ru.sbt.util.HTTPDatapool.httpdto.*;
 import ru.sbt.util.HTTPDatapool.paramsContainer.DataContainerFactory;
 
 import java.util.List;

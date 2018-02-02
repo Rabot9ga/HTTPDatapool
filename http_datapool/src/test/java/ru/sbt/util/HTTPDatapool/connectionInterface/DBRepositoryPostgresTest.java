@@ -27,6 +27,14 @@ public class DBRepositoryPostgresTest extends AbstractTransactionalTestNGSpringC
     }
 
     @Test
+    public void getFromFORTESTTableBetween() throws Exception {
+        List<Map<String, Object>> test_table = dbRepository.getFromTableBetween("FORTEST2", 1, 3600);
+        log.debug("test_table: {}", test_table);
+        log.debug("test_table.size() = {}", test_table.size());
+        Assert.assertTrue(test_table.size() == 10);
+    }
+
+    @Test
     public void testGetTableSize() throws Exception {
         int test_table = dbRepository.getTableSize("TEST_TABLE");
         log.debug("test_table.size = {}", test_table);

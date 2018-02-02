@@ -28,5 +28,4 @@ public class AsyncDownloadPool {
                 selectThread);
         service.allowCoreThreadTimeOut(true);
     }
-
 }

@@ -9,7 +9,7 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import ru.sbt.util.HTTPDatapool.connectionInterface.TablesCache;
-import ru.sbt.util.HTTPDatapool.httpapi.*;
+import ru.sbt.util.HTTPDatapool.httpdto.*;
 import ru.sbt.util.HTTPDatapool.paramsContainer.utils.Generator;
 
 import java.util.HashSet;

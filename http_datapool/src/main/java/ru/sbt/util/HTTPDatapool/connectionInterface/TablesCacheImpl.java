@@ -37,13 +37,17 @@ public class TablesCacheImpl implements TablesCache {
 
     @Override
     public Optional<List<Map<String, Object>>> getDataFromCache(String tableName, Set<String> columnNames) {
+        log.debug("getDataFromCache() tableName:{}, columnNames:{}", tableName, columnNames);
+
         Optional<List<Map<String, Object>>> table = cache.entrySet().stream()
                 .filter(entry -> entry.getKey().equals(tableName))
                 .map(Map.Entry::getValue)
                 .findAny();
+//        log.debug("getTableFromCache: {}", table);
 
         if (!columnNames.contains("*")) {
-            table.map(maps -> filterColumns(maps, columnNames));
+            table = table.map(maps -> filterColumns(maps, columnNames));
+//            log.debug("filteredTable: {}", table);
         }
 
         if (!table.isPresent()) {
@@ -98,6 +102,7 @@ public class TablesCacheImpl implements TablesCache {
     }
 
     private CacheTableInfo createCacheTableInfo(Map.Entry<String, TableDownloader> entry) {
+        // TODO: 01.02.2018 Написать тест проверяющий статусы закачки
         AddingStatus status;
         double downloadProgress = entry.getValue().getDownloadProgress();
         if (downloadProgress == 0) {
@@ -119,8 +124,15 @@ public class TablesCacheImpl implements TablesCache {
 
     private List<Map<String, Object>> filterColumns(List<Map<String, Object>> table, Set<String> columnNames) {
         return table.stream()
-                .map(stringStringMap -> filterTableByColumns(stringStringMap, columnNames))
+                .map(stringObjectMap -> filterTableByColumns(stringObjectMap, columnNames))
                 .collect(Collectors.toList());
+    }
+
+    private Map<String, Object> filterTableByColumns(Map<String, Object> stringObjectMap, Set<String> columnNames) {
+
+        return stringObjectMap.entrySet().stream()
+                .filter(stringObjectEntry -> columnNames.contains(stringObjectEntry.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private void cachePut(String tableName) {
@@ -130,12 +142,6 @@ public class TablesCacheImpl implements TablesCache {
             log.debug("countThread: {}", downloadPool.getService().getMaximumPoolSize());
             tableDownloader.putInCache();
         }
-    }
-
-    private Map<String, Object> filterTableByColumns(Map<String, Object> stringObjectMap, Set<String> columnNames) {
-        return stringObjectMap.entrySet().stream()
-                .filter(stringObjectEntry -> columnNames.contains(stringObjectEntry.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
 }

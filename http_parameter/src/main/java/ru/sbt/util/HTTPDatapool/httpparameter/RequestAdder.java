@@ -1,7 +1,7 @@
 package ru.sbt.util.HTTPDatapool.httpparameter;
 
 import retrofit2.Response;
-import ru.sbt.util.HTTPDatapool.httpapi.*;
+import ru.sbt.util.HTTPDatapool.httpdto.*;
 
 import java.io.IOException;
 import java.util.*;
@@ -44,18 +44,30 @@ public class RequestAdder {
             response = controller.getParameter(datapoolRequest).execute();
         } catch (IOException e) {
             e.printStackTrace();
-            return new ParameterList(new ArrayList<>());
+            return new ParameterList(new ArrayList<>(), Status.ERROR);
         }
 
-        DatapoolResponse body = response.body();
 
+        Status status;
+        if (!response.isSuccessful()) {
+            return new ParameterList(new ArrayList<>(), Status.ERROR);
+        }
+
+
+        DatapoolResponse body = response.body();
         Map<ParametersTable, ResponseTables> responseTables = body.getResponseTables();
+
+        if (responseTables.entrySet().stream().anyMatch(entry -> entry.getValue().getStatus().equals(Status.BUSY))) {
+            status = Status.BUSY;
+        } else {
+            status = Status.SUCCESS;
+        }
 
         List<Map<String, Object>> list = requestSet.stream()
                 .map(responseTables::get)
                 .map(ResponseTables::getMapParameters)
                 .collect(Collectors.toList());
 
-        return new ParameterList(list);
+        return new ParameterList(list, status);
     }
 }

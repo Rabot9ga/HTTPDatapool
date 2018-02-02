@@ -1,7 +1,6 @@
 package ru.sbt.util.HTTPDatapool.controllers;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,26 +8,23 @@ import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.jackson.JacksonConverterFactory;
 import ru.sbt.util.HTTPDatapool.connectionInterface.DBRepository;
-import ru.sbt.util.HTTPDatapool.controllers.Interfaces.MainController;
-import ru.sbt.util.HTTPDatapool.httpapi.DatapoolRequest;
-import ru.sbt.util.HTTPDatapool.httpapi.DatapoolResponse;
-import ru.sbt.util.HTTPDatapool.httpapi.ParametersTable;
-import ru.sbt.util.HTTPDatapool.httpapi.RequestType;
+import ru.sbt.util.HTTPDatapool.httpdto.*;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+import static org.testng.Assert.*;
+
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, properties = "logging.level.ru.sbt.util.HTTPDatapool=debug")
 @Slf4j
 public class MainControllerTest extends AbstractTransactionalTestNGSpringContextTests {
 
@@ -43,40 +39,29 @@ public class MainControllerTest extends AbstractTransactionalTestNGSpringContext
     @Autowired
     private DBRepository dbRepository;
 
-    @BeforeClass
-    public void setUp() throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://localhost:" + port)
-                .addConverterFactory(JacksonConverterFactory.create())
-                .build();
-
-        mainController = retrofit.create(MainController.class);
-    }
-
     @Test
-    public void getParameter() throws IOException {
+    public void getParameter() throws IOException, InterruptedException {
 
 
         HashSet<String> columns = new HashSet<>();
-        columns.add("ID");
-        columns.add("NAME");
-        columns.add("AGE");
-        columns.add("PHONE");
+        columns.add("COLUMN1");
+        columns.add("COLUMN2");
+        columns.add("COLUMN3");
+        columns.add("COLUMN4");
 
-        String tableName = "FORTEST";
+        String tableName = "FORTEST2";
 
         int tableSize = dbRepository.getTableSize(tableName);
         List<Map<String, Object>> dataFromTable = dbRepository.getFromTableBetween(tableName, 1, tableSize);
 
         ParametersTable parametersTable = ParametersTable.builder()
-                .scriptName("FORTEST")
+                .scriptName("FORTEST2")
                 .tableName(tableName)
                 .type(RequestType.RANDOM)
                 .columnsName(columns)
                 .build();
 
-        HashSet<ParametersTable> parametersTables = new HashSet<>();
+        Set<ParametersTable> parametersTables = new HashSet<>();
         parametersTables.add(parametersTable);
 
         DatapoolRequest request = DatapoolRequest.builder().parametersTables(parametersTables).build();
@@ -88,28 +73,36 @@ public class MainControllerTest extends AbstractTransactionalTestNGSpringContext
         log.info("DataFromTable: {}", dataFromTable);
         log.info("DatapoolRequest: {}", request);
 
-        Response<DatapoolResponse> response = mainController.getParameter(request).execute();
 
-        int code = response.code();
-        log.info("response.code() = {}", code);
+        ResponseEntity<DatapoolResponse> response;
 
-        DatapoolResponse datapoolResponse = response.body();
-        log.info("DatapoolResponse: {}", datapoolResponse);
+        while (true) {
+            response = testRestTemplate.postForEntity("/api/getParameter", request, DatapoolResponse.class);
 
+            log.debug("response: {}", response);
 
-//        boolean statusBusy = datapoolResponse.getResponseTablesStream().anyMatch(entry -> entry.getValue().getStatus().equals(Status.BUSY));
+            int code = response.getStatusCodeValue();
+            log.info("response.code() = {}", code);
 
+            assertEquals(response.getStatusCodeValue(), 200, "status code is not 200");
 
-//        List<Map<String, String>> dataFromCacheConvert = dataFromCache.get().stream()
-//                .map(this::convertMap)
-//                .collect(Collectors.toList());
+            DatapoolResponse datapoolResponse = response.getBody();
+            log.info("DatapoolResponse: {}", datapoolResponse);
 
+            Map<ParametersTable, ResponseTables> tables = datapoolResponse.getResponseTables();
+            tables.forEach((parametersTable1, responseTables) -> assertNotEquals(responseTables.getStatus(), Status.ERROR, "Status ERROR"));
 
-//        datapoolResponse.getResponseTables().forEach((parametersTable1, responseTables) -> Assert.assertTrue(dataFromCacheConvert.contains(convertMap(responseTables.getMapParameters()))));
+            if (tables.entrySet().stream().allMatch(entry -> !entry.getValue().getStatus().equals(Status.BUSY))) {
+                break;
+            }
+            TimeUnit.SECONDS.sleep(1);
+        }
 
+        List<Map<String, String>> convetedData = dataFromTable.stream().map(this::convertMap).collect(Collectors.toList());
 
-        log.info("=======================================================");
-        log.info("=======================================================");
+        assertTrue(response.getBody().getResponseTablesStream()
+                .map(entry -> entry.getValue().getMapParameters())
+                .allMatch(map -> convetedData.contains(convertMap(map))), "Data from response does'n match data from DB");
 
     }
 

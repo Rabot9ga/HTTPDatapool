@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.sbt.util.HTTPDatapool.datapool.Datapool;
-import ru.sbt.util.HTTPDatapool.httpapi.DatapoolRequest;
-import ru.sbt.util.HTTPDatapool.httpapi.DatapoolResponse;
+import ru.sbt.util.HTTPDatapool.httpdto.DatapoolRequest;
+import ru.sbt.util.HTTPDatapool.httpdto.DatapoolResponse;
 
 @RestController
 @RequestMapping("/api")

@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.sbt.util.HTTPDatapool.httpapi.RequestType;
+import ru.sbt.util.HTTPDatapool.httpdto.RequestType;
 import ru.sbt.util.HTTPDatapool.paramsContainer.DataContainerFactory;
 import ru.sbt.util.HTTPDatapool.paramsContainer.api.DataContainerAPI;
 import ru.sbt.util.HTTPDatapool.paramsContainer.dto.TestResult;

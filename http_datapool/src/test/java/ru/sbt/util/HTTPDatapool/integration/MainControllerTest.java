@@ -6,17 +6,16 @@ import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import ru.sbt.util.HTTPDatapool.httpapi.RequestType;
+import ru.sbt.util.HTTPDatapool.httpdto.RequestType;
+import ru.sbt.util.HTTPDatapool.httpdto.Status;
 import ru.sbt.util.HTTPDatapool.httpparameter.HttpParameter;
 import ru.sbt.util.HTTPDatapool.httpparameter.ParameterList;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.concurrent.TimeUnit;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Slf4j
@@ -26,7 +25,6 @@ public class MainControllerTest extends AbstractTransactionalTestNGSpringContext
     int port;
 
 
-
     @BeforeClass
     public void setUp() throws Exception {
     }
@@ -34,32 +32,32 @@ public class MainControllerTest extends AbstractTransactionalTestNGSpringContext
     @Test
     public void getParameter() throws IOException, InterruptedException {
 
-        ExecutorService service = Executors.newFixedThreadPool(1);
+        Status status;
+        ParameterList parameters;
 
-        Callable<ParameterList> callable = () -> HttpParameter.getInstance("http://localhost:" + port)
+        while (true) {
+            parameters = HttpParameter.getInstance("http://localhost:" + port)
+                    .addRequest("FORTEST", RequestType.RANDOM, "testScript", "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4")
 //                .addRequest("TABLE1", RequestType.RANDOM, "testScript", "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4")
 //                .addRequest("TABLE2", RequestType.RANDOM, "testScript", "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4")
 //                .addRequest("TABLE3", RequestType.RANDOM, "testScript", "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4")
-                .addRequest("FORTEST", RequestType.RANDOM, "testScript", "ID", "NAME", "AGE", "PHONE")
-                .getParameters();
+                    .getParameters();
 
+            log.debug("parameters: {}", parameters);
 
-        List<Future<ParameterList>> collect = IntStream.range(0, 10).mapToObj(value -> service.submit(callable)).collect(Collectors.toList());
+            status = parameters.getStatus();
 
-        Thread.sleep(100);
-        for (Future<ParameterList> parameterListFuture : collect) {
-            ParameterList parameterList = null;
-            try {
-                parameterList = parameterListFuture.get();
-            } catch (InterruptedException | ExecutionException e) {
+            Assert.assertNotEquals(status, Status.ERROR, "status is error!");
 
+            if (!status.equals(Status.BUSY)) {
+                break;
             }
-            System.out.println("parameterList = " + parameterList);
-
+            TimeUnit.SECONDS.sleep(1);
         }
 
 
-
+        Assert.assertEquals(status, Status.SUCCESS);
+        parameters.getParameters().forEach(map -> Assert.assertNotEquals(map, null));
 
 
     }

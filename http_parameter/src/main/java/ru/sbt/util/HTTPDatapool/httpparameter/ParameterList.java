@@ -1,18 +1,25 @@
 package ru.sbt.util.HTTPDatapool.httpparameter;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
+import ru.sbt.util.HTTPDatapool.httpdto.Status;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Data
+@ToString
 public class ParameterList {
 
+    @Getter
+    private Status status;
+
+    @Getter
     private List<Map<String, Object>> parameters;
 
-    public ParameterList(List<Map<String, Object>> parameters) {
+    public ParameterList(List<Map<String, Object>> parameters, Status status) {
         this.parameters = parameters;
+        this.status = status;
     }
 
     public Map<String, Object> getRequestValue(int i) {

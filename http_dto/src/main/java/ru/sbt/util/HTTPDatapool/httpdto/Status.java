@@ -1,4 +1,4 @@
-package ru.sbt.util.HTTPDatapool.httpapi;
+package ru.sbt.util.HTTPDatapool.httpdto;
 
 import java.io.Serializable;
 

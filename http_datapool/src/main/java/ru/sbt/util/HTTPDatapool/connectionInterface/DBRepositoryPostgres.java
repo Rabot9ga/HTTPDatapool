@@ -20,7 +20,7 @@ public class DBRepositoryPostgres implements DBRepository {
     public List<Map<String, Object>> getFromTableBetween(String tableName, int from, int to) {
 
 // TODO: 31.01.2018 Сделать параметризованый квери
-        String query = "SELECT * FROM public.\"" + tableName + "\" LIMIT " + (to - from + 1) + " OFFSET " + from;
+        String query = "SELECT * FROM public.\"" + tableName + "\" LIMIT " + (to - from + 1) + " OFFSET " + (from - 1);
         log.debug("query={}", query);
         return jdbcTemplate.queryForList(query);
     }

@@ -1,4 +1,4 @@
-package ru.sbt.util.HTTPDatapool.httpapi;
+package ru.sbt.util.HTTPDatapool.httpdto;
 
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +16,7 @@ public class ParametersTable implements Serializable {
     Set<String> columnsName;
     String scriptName;
 
-    public Stream<String> getColumnsNameStream(){
+    public Stream<String> getColumnsNameStream() {
         return columnsName.stream();
     }
 

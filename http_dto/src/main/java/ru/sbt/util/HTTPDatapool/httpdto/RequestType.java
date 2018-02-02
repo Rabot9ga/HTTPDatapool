@@ -1,10 +1,9 @@
-package ru.sbt.util.HTTPDatapool.httpapi;
+package ru.sbt.util.HTTPDatapool.httpdto;
 
 /**
  * Class for choosing type of consuming parameters
  *
  * @author SBT-Muravev-AA
- *
  */
 public enum RequestType {
 

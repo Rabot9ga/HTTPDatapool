@@ -1,4 +1,4 @@
-package ru.sbt.util.HTTPDatapool.httpapi;
+package ru.sbt.util.HTTPDatapool.httpdto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;

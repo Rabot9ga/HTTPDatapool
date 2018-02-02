@@ -1,4 +1,5 @@
-package ru.sbt.util.HTTPDatapool.httpapi;
+package ru.sbt.util.HTTPDatapool.httpdto;
+
 import lombok.Builder;
 import lombok.Data;
 

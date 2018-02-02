@@ -1,6 +1,6 @@
 package ru.sbt.util.HTTPDatapool.paramsContainer.api;
 
-import ru.sbt.util.HTTPDatapool.httpapi.RequestType;
+import ru.sbt.util.HTTPDatapool.httpdto.RequestType;
 
 import java.util.List;
 

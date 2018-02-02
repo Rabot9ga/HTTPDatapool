@@ -1,6 +1,6 @@
 package ru.sbt.util.HTTPDatapool;
 
-import ru.sbt.util.HTTPDatapool.httpapi.RequestType;
+import ru.sbt.util.HTTPDatapool.httpdto.RequestType;
 import ru.sbt.util.HTTPDatapool.httpparameter.HttpParameter;
 import ru.sbt.util.HTTPDatapool.httpparameter.ParameterList;
 

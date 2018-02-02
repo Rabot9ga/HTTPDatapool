@@ -1,7 +1,7 @@
 version '0.0.1-SNAPSHOT'
 
 dependencies {
-    compile project(':httpapi')
+    compile project(':http_dto')
     compile('com.squareup.retrofit2:retrofit:2.3.0')
     compile('com.squareup.retrofit2:converter-jackson:2.3.0')
 
