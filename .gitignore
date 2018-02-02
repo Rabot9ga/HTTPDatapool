@@ -2,8 +2,6 @@ log/
 http_datapool/log/
 http_datapool/out/
 
-
-.gradle
 /build/
 !gradle/wrapper/gradle-wrapper.jar
 
