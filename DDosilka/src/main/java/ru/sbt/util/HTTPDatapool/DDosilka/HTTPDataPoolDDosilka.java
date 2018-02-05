@@ -1,6 +1,7 @@
 package ru.sbt.util.HTTPDatapool.DDosilka;
 
 import ru.sbt.util.HTTPDatapool.httpdto.RequestType;
+import ru.sbt.util.HTTPDatapool.httpdto.Status;
 import ru.sbt.util.HTTPDatapool.httpparameter.HttpParameter;
 import ru.sbt.util.HTTPDatapool.httpparameter.ParameterList;
 
@@ -34,7 +35,7 @@ public class HTTPDataPoolDDosilka {
         System.out.println("Requesting host: " + args[0] + " with " + args[1] + " threads. Tasks per Thread: " + args[2]);
         System.out.println("Requesting Table: " + args[3] + ". Requested column is " + args[4]);
 
-        int taskCount = Integer.parseInt(args[1]);
+        int threadCount = Integer.parseInt(args[1]);
 
         Callable<ParameterList> callable = () -> HttpParameter.getInstance("http://" + args[0] + ":8080")
                 .addRequest(args[3], RequestType.RANDOM, "testScript123", "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4")
@@ -48,12 +49,19 @@ public class HTTPDataPoolDDosilka {
 
         int tasks = Integer.parseInt(args[2]);
 
-        for (int i = 0; i < taskCount; i++) {
+        for (int i = 0; i < threadCount; i++) {
             LoaderService.submit(() -> {
                 for (int j = 0; j < tasks; j++) {
                     try {
-                        callable.call().getRequestValue(0).get(args[4]);
-                        ai.incrementAndGet();
+                        ParameterList parameterList = callable.call();
+
+                        if (parameterList.getStatus().equals(Status.BUSY)) {
+                            System.err.println(Thread.currentThread().getName() + " is BUSY");
+                            TimeUnit.SECONDS.sleep(1);
+                        } else {
+                            parameterList.getRequestValue(0).get(args[4]);
+                            ai.incrementAndGet();
+                        }
 //                        callable.call().getRequestValue(0).get("COLUMN2");
 //                        callable.call().getRequestValue(0).get("COLUMN3");
                     } catch (Exception e) {
@@ -76,7 +84,7 @@ public class HTTPDataPoolDDosilka {
 
 
         while (!LoaderService.isTerminated()) {
-            if (LoaderService.getCompletedTaskCount() == taskCount) {
+            if (LoaderService.getCompletedTaskCount() == threadCount) {
                 LoaderService.shutdown();
                 TPSCounterService.shutdown();
                 CalculateStats(TPSes);
