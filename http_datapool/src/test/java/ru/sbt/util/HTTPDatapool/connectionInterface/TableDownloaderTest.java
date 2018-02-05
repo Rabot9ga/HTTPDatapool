@@ -22,8 +22,8 @@ import static org.testng.Assert.assertNotEquals;
 @Slf4j
 public class TableDownloaderTest {
 
-    ConcurrentHashMap<String, List<Map<String, Object>>> cache = new ConcurrentHashMap<>();
-    ExecutorService service = Executors.newFixedThreadPool(50);
+    ConcurrentHashMap<String, TableDownloader> cache = new ConcurrentHashMap<>();
+    ExecutorService service = Executors.newFixedThreadPool(10);
 
 
     private DBRepository dbRepository;
@@ -52,30 +52,32 @@ public class TableDownloaderTest {
             }
             List<Map<String, Object>> list = Generator.fillDataList(countRowsOneSelect - deviation);
             table.addAll(list);
-            when(this.dbRepository.getFromTableBetween(tableName, from, to - deviation)).thenReturn(list);
+            when(this.dbRepository.getFromTableBetween(tableName, from, to)).thenReturn(list);
         }
 
     }
 
     @BeforeMethod
     public void setUp() throws Exception {
-        downloader = new TableDownloader(cache, service, dbRepository, tableName, countRowsOneSelect);
-
+        downloader = new TableDownloader(service, dbRepository, tableName, countRowsOneSelect);
+        cache.put(tableName, downloader);
     }
 
     @Test
     public void testPutInCache() throws Exception {
         downloader.putInCache();
         double progress = downloader.getDownloadProgress();
-        while (progress < 1.0) {
-            progress = downloader.getDownloadProgress();
+        while (!downloader.isReady()) {
+
         }
         Thread.sleep(1);
 
         assertEquals(cache.mappingCount(), 1);
-        List<Map<String, Object>> maps = cache.get(tableName);
+        TableDownloader downloader = cache.get(tableName);
 
-        assertEquals(table, tableName);
+        List<Map<String, Object>> data = downloader.getData();
+
+        assertEquals(table, data);
     }
 
     @Test

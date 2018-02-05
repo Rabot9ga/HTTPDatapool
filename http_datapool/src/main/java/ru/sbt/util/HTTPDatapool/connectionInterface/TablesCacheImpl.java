@@ -9,10 +9,7 @@ import ru.sbt.util.HTTPDatapool.controllers.dto.AddingStatus;
 import ru.sbt.util.HTTPDatapool.controllers.dto.CacheTableInfo;
 import ru.sbt.util.HTTPDatapool.threadpools.AsyncDownloadPool;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -28,8 +25,7 @@ public class TablesCacheImpl implements TablesCache {
     @Setter
     private AsyncDownloadPool downloadPool;
 
-    private ConcurrentHashMap<String, List<Map<String, Object>>> cache = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, TableDownloader> partOfJob = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, TableDownloader> cache = new ConcurrentHashMap<>();
 
     @Value("${countRowsOneSelect:1000}")
     @Setter
@@ -39,36 +35,51 @@ public class TablesCacheImpl implements TablesCache {
     public Optional<List<Map<String, Object>>> getDataFromCache(String tableName, Set<String> columnNames) {
         log.debug("getDataFromCache() tableName:{}, columnNames:{}", tableName, columnNames);
 
-        Optional<List<Map<String, Object>>> table = Optional.ofNullable(cache.get(tableName));
-//        log.debug("getTableFromCache: {}", table);
+        TableDownloader downloader = cache.get(tableName);
+        if (downloader == null) {
+            TableDownloader tableDownloader = new TableDownloader(downloadPool.getService(), dbRepository, tableName, countRowsOneSelect);
+            TableDownloader ifAbsent = cache.putIfAbsent(tableName, tableDownloader);
+            if (ifAbsent == null) {
+                downloader = tableDownloader;
+                downloader.putInCache();
+            } else {
+                downloader = ifAbsent;
+            }
+        }
 
+        Optional<List<Map<String, Object>>> table = Optional.ofNullable(downloader.getData());
         if (!columnNames.contains("*")) {
             table = table.map(maps -> filterColumns(maps, columnNames));
-//            log.debug("filteredTable: {}", table);
         }
 
-        if (!table.isPresent()) {
-            cachePut(tableName);
-        }
         return table;
     }
 
     @Override
     public void clearAllCaches() {
+        cache.values().stream().filter(Objects::nonNull).forEach(TableDownloader::deleteFromCache);
         cache.clear();
-        partOfJob.clear();
+
     }
 
     @Override
     public void clearCache(String tableName) {
+        TableDownloader downloader = cache.get(tableName);
+        if (downloader != null) {
+            downloader.deleteFromCache();
+        }
         cache.remove(tableName);
-        partOfJob.remove(tableName);
+
     }
 
     @Override
     public int getCountRowsInCachedTable(String tableName) {
         if (cache.containsKey(tableName)) {
-            return cache.get(tableName).size();
+            List<Map<String, Object>> data = cache.get(tableName).getData();
+            if (data != null) {
+                return data.size();
+            }
+            return -1;
         } else {
             return -1;
         }
@@ -76,32 +87,35 @@ public class TablesCacheImpl implements TablesCache {
 
     @Override
     public double getLoadedPercent(String tableName) {
-        if (partOfJob.containsKey(tableName)) {
-            return partOfJob.get(tableName).getDownloadProgress();
+        TableDownloader downloader = cache.get(tableName);
+        if (downloader != null) {
+            return downloader.getDownloadProgress();
         }
         return 0;
     }
 
     @Override
     public List<String> getAllTableNamesInCache() {
-        return partOfJob.entrySet().stream()
-                .map(Map.Entry::getKey)
+
+        return cache.values().stream()
+                .filter(TableDownloader::isReady)
+                .map(TableDownloader::getTableName)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<CacheTableInfo> getAllInfoAboutTablesInCache() {
 
-        return partOfJob.entrySet().stream()
+        return cache.values().stream()
                 .map(this::createCacheTableInfo)
                 .collect(Collectors.toList());
 
     }
 
-    private CacheTableInfo createCacheTableInfo(Map.Entry<String, TableDownloader> entry) {
+    private CacheTableInfo createCacheTableInfo(TableDownloader tableDownloader) {
         // TODO: 01.02.2018 Написать тест проверяющий статусы закачки
         AddingStatus status;
-        double downloadProgress = entry.getValue().getDownloadProgress();
+        double downloadProgress = tableDownloader.getDownloadProgress();
         if (downloadProgress == 0) {
             status = AddingStatus.NEW;
         } else if (downloadProgress == 1) {
@@ -111,9 +125,9 @@ public class TablesCacheImpl implements TablesCache {
         }
 
         return CacheTableInfo.builder()
-                .name(entry.getKey())
-                .progressDownload(entry.getValue().getDownloadProgress())
-                .rowCount(entry.getValue().getDownloadedRowCount())
+                .name(tableDownloader.getTableName())
+                .progressDownload(tableDownloader.getDownloadProgress())
+                .rowCount(tableDownloader.getDownloadedRowCount())
                 .status(status)
                 .build();
     }
@@ -130,15 +144,6 @@ public class TablesCacheImpl implements TablesCache {
         return stringObjectMap.entrySet().stream()
                 .filter(stringObjectEntry -> columnNames.contains(stringObjectEntry.getKey()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
-
-    private void cachePut(String tableName) {
-        TableDownloader tableDownloader = new TableDownloader(cache, downloadPool.getService(), dbRepository, tableName, countRowsOneSelect);
-
-        if (partOfJob.putIfAbsent(tableName, tableDownloader) == null) {
-            log.debug("countThread: {}", downloadPool.getService().getMaximumPoolSize());
-            tableDownloader.putInCache();
-        }
     }
 
 }

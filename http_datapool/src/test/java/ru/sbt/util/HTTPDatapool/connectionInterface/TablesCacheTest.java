@@ -24,13 +24,13 @@ public class TablesCacheTest extends AbstractTransactionalTestNGSpringContextTes
 
     String tableName = "FORTEST";
 
-    @Test
+    @Test(timeOut = 5000)
     public void testGetDataFromCache() throws Exception {
         List<Map<String, Object>> table = fillCache(tableName);
         assertEquals(table.size(), 10010);
     }
 
-    @Test
+    @Test(timeOut = 5000)
     public void testClearAllCaches() throws Exception {
         fillCache(tableName);
         tablesCache.clearAllCaches();
@@ -39,7 +39,7 @@ public class TablesCacheTest extends AbstractTransactionalTestNGSpringContextTes
 
     }
 
-    @Test
+    @Test(timeOut = 5000)
     public void testClearCache() throws Exception {
         fillCache(tableName);
         tablesCache.clearCache(tableName);
@@ -49,7 +49,7 @@ public class TablesCacheTest extends AbstractTransactionalTestNGSpringContextTes
         assertEquals(tablesInCache.size(), 0);
     }
 
-    @Test
+    @Test(timeOut = 5000)
     public void testClearDownloadingCache() throws Exception {
         tablesCache.getDataFromCache(tableName, Collections.singleton("*"));
         tablesCache.clearCache(tableName);
@@ -59,14 +59,14 @@ public class TablesCacheTest extends AbstractTransactionalTestNGSpringContextTes
         assertEquals(tablesInCache.size(), 0);
     }
 
-    @Test
+    @Test(timeOut = 5000)
     public void testGetCountRowsInCachedTable() throws Exception {
         fillCache(tableName);
         int rowsInCachedTable = tablesCache.getCountRowsInCachedTable(tableName);
         assertEquals(rowsInCachedTable, 10010);
     }
 
-    @Test
+    @Test(timeOut = 5000)
     public void testGetLoadedPercent() throws Exception {
         tablesCache.getDataFromCache(tableName, Collections.singleton("*"));
 
@@ -79,7 +79,7 @@ public class TablesCacheTest extends AbstractTransactionalTestNGSpringContextTes
         }
     }
 
-    @Test
+    @Test(timeOut = 5000)
     public void testGetAllTableNamesInCache() throws Exception {
         fillCache(tableName);
         fillCache("FORTEST2");
@@ -89,7 +89,7 @@ public class TablesCacheTest extends AbstractTransactionalTestNGSpringContextTes
         assertEquals(namesInCache, strings);
     }
 
-    @Test
+    @Test(timeOut = 5000)
     public void testGetAllInfoAboutDownloadingTablesInCache() throws Exception {
         tablesCache.getDataFromCache(tableName, Collections.singleton("*"));
         List<CacheTableInfo> allInfoAboutTablesInCache = tablesCache.getAllInfoAboutTablesInCache();
@@ -108,7 +108,7 @@ public class TablesCacheTest extends AbstractTransactionalTestNGSpringContextTes
         assertTrue(rowCount >= 0 && rowCount <= 10010);
     }
 
-    @Test
+    @Test(timeOut = 5000)
     public void testGetAllInfoDownloadedTablesInCache() throws Exception {
         fillCache(tableName);
         fillCache("FORTEST2");

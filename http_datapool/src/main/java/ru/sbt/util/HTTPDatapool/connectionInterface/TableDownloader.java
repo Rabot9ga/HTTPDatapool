@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -15,7 +14,9 @@ public class TableDownloader {
     private AtomicInteger passCountFuture = new AtomicInteger();
     private AtomicInteger failCountFuture = new AtomicInteger();
 
-    private final ConcurrentHashMap<String, List<Map<String, Object>>> cache;
+    @Getter
+    private List<Map<String, Object>> data;
+
     private final ExecutorService service;
     private final DBRepository dbRepository;
     @Getter
@@ -32,8 +33,10 @@ public class TableDownloader {
     private ArrayList<CompletableFuture<Void>> futures;
     private volatile boolean abortedDownload;
 
-    public TableDownloader(ConcurrentHashMap<String, List<Map<String, Object>>> cache, ExecutorService service, DBRepository dbRepository, String tableName, int countRowsOneSelect) {
-        this.cache = cache;
+    @Getter
+    private volatile boolean isReady = false;
+
+    public TableDownloader(ExecutorService service, DBRepository dbRepository, String tableName, int countRowsOneSelect) {
         this.service = service;
         this.dbRepository = dbRepository;
         this.tableName = tableName;
@@ -107,12 +110,14 @@ public class TableDownloader {
             List<Map<String, Object>> listMap;
             if (failCount > 0) {
                 listMap = Arrays.stream(tmpLines)
+                        .parallel()
                         .filter(Objects::nonNull)
                         .collect(Collectors.toList());
             } else {
                 listMap = Arrays.asList(tmpLines);
             }
-            cache.putIfAbsent(tableName, listMap);
+            data = listMap;
+            isReady = true;
         }
     }
 
