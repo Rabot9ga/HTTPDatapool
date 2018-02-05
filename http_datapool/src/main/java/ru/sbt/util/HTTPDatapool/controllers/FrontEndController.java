@@ -10,7 +10,6 @@ import ru.sbt.util.HTTPDatapool.connectionInterface.DBRepository;
 import ru.sbt.util.HTTPDatapool.connectionInterface.TablesCache;
 import ru.sbt.util.HTTPDatapool.controllers.dto.CacheTableInfo;
 import ru.sbt.util.HTTPDatapool.controllers.dto.MetricsContainer;
-import ru.sbt.util.HTTPDatapool.controllers.dto.StatusContainer;
 import ru.sbt.util.HTTPDatapool.datapool.Datapool;
 
 import javax.annotation.PostConstruct;
@@ -58,8 +57,7 @@ public class FrontEndController {
     public ResponseEntity<List<CacheTableInfo>> getTables() {
 
         list = tablesCache.getAllInfoAboutTablesInCache();
-        log.info("getTables was executed! list is {}", list);
-
+        log.debug("getTables was executed! list is {}", list);
 
         return ResponseEntity.ok(list);
     }
@@ -72,7 +70,7 @@ public class FrontEndController {
      */
     @PostMapping("/clearTable")
     public ResponseEntity<List<CacheTableInfo>> clearCache(@RequestBody String tableName) {
-        log.info("clearCache was executed for table {}", tableName);
+        log.debug("clearCache was executed for table {}", tableName);
 
         tablesCache.clearCache(tableName);
         datapool.clearCache(tableName);
@@ -106,21 +104,21 @@ public class FrontEndController {
      * @return rs object with StatusContainer storing required data
      */
 
-    @PostMapping("/getStatus")
-    public ResponseEntity<StatusContainer> getStatus(@RequestBody String tableName) {
-
-        StatusContainer status;
-        double loadedPercent = tablesCache.getLoadedPercent(tableName);
-
-        if (loadedPercent == 100) {
-            status = new StatusContainer("READY", Double.toString(loadedPercent));
-        } else {
-            status = new StatusContainer("UPDATING", Double.toString(loadedPercent));
-        }
-
-        log.debug("getStatus was executed for table {}. Status is {}, percent is {}", tableName, status.getStatus(), status.getPercent());
-        return ResponseEntity.ok(status);
-    }
+//    @PostMapping("/getStatus")
+//    public ResponseEntity<StatusContainer> getStatus(@RequestBody String tableName) {
+//
+//        StatusContainer status;
+//        double loadedPercent = tablesCache.getLoadedPercent(tableName);
+//
+//        if (loadedPercent == 100) {
+//            status = new StatusContainer("READY", Double.toString(loadedPercent));
+//        } else {
+//            status = new StatusContainer("UPDATING", Double.toString(loadedPercent));
+//        }
+//
+//        log.debug("getStatus was executed for table {}. Status is {}, percent is {}", tableName, status.getStatus(), status.getPercent());
+//        return ResponseEntity.ok(status);
+//    }
 
 
     /**

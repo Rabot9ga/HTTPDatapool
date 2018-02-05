@@ -1,6 +1,11 @@
 var app = angular.module('HTTPDataPoolFront', []);
 
 app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
+    // init
+    $scope.sort = {
+        sortingOrder: 'id',
+        reverse: false
+    };
     $scope.gap = 5;
     $scope.filteredItems = [];
     $scope.groupedItems = [];
@@ -11,11 +16,11 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
 
     $scope.tablesAvailableToAdd = [];
 
-
     //data typed in input for adding table
     $scope.tableToAdd = '';
 
     $scope.getTables = function () {
+
 
         $http.get("/api/frontEnd/getTables")
             .then(function (response) {
@@ -26,22 +31,21 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
 
     $scope.getTables();
 
-
     /**
      * Function used to update adding status of specific table
      * Returns true if adding Table to cache is done
      *
      * @param tableName - name of table which should be
      */
-    function updateAddingStatus(tableName) {
-        return $http.post("/api/frontEnd/getStatus", tableName)
-            .then(function (response) {
-                if (response.data.status === "READY")
-                    return true;
-                else
-                    return false;
-            });
-    }
+    // function updateAddingStatus(tableName) {
+    //     return $http.post("/api/frontEnd/getStatus", tableName)
+    //         .then(function (response) {
+    //             if (response.data.status === "READY")
+    //                 return true;
+    //             else
+    //                 return false;
+    //         });
+    // }
 
     /**
      * Adding table to cache
@@ -60,10 +64,10 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
 
                     $scope.updateTablesInDBSuggestionsList();
 
-                    var stop = $interval(function () {
-                        var isUpdateDone = updateAddingStatus(name);
-                        if (isUpdateDone) $interval.cancel(stop);
-                    }, 1000);
+                    // var stop = $interval(function () {
+                    //     var isUpdateDone = updateAddingStatus(name);
+                    //     if (isUpdateDone) $interval.cancel(stop);
+                    // }, 1000);
                     $.confirm({
                         icon: 'fa fa-spinner fa-spin',
                         title: 'Мы работаем над этим..',
@@ -109,7 +113,7 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
             buttons: {
                 tryDelete: {
                     text: 'Удаляем!',
-                    btnClass: 'btn-red btn-transparent',
+                    btnClass: 'btn-red btn-lightgrey',
                     action: function () {
                         $scope.clickClearTableCache(name);
                     }
@@ -265,19 +269,26 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
             return true;
         }
         return haystack.toLowerCase().indexOf(needle.toLowerCase()) !== -1;
+        // return haystack.indexOf(needle) !== -1;
     };
 
     // init the filtered items
     $scope.search = function () {
-
-
         $scope.filteredItems = $filter('filter')($scope.items, function (item) {
-            for (var attr in item) {
-                if (searchMatch(item[attr], $scope.query))
+            // for (var attr in item) {
+            //     if (searchMatch(item[attr], $scope.query))
+            //         return true;
+            // }
+            // for (var attr in item) {
+                if (searchMatch(item["name"], $scope.query))
                     return true;
-            }
+            // }
             return false;
         });
+        // take care of the sorting order
+        if ($scope.sort.sortingOrder !== '') {
+            $scope.filteredItems = $filter('orderBy')($scope.filteredItems, $scope.sort.sortingOrder, $scope.sort.reverse);
+        }
         $scope.currentPage = 0;
         // now group by pages
         $scope.groupToPages();
@@ -333,6 +344,44 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
 
 app.$inject = ['$scope', '$filter'];
 
+app.directive("customSort", function () {
+    return {
+        restrict: 'A',
+        transclude: true,
+        scope: {
+            order: '=',
+            sort: '='
+        },
+        template:
+        ' <a ng-click="sort_by(order)" style="color: #555555;">' +
+        '    <span ng-transclude></span>' +
+        '    <i ng-class="selectedCls(order)"></i>' +
+        '</a>',
+        link: function (scope) {
+
+            // change sorting order
+            scope.sort_by = function (newSortingOrder) {
+                var sort = scope.sort;
+
+                if (sort.sortingOrder == newSortingOrder) {
+                    sort.reverse = !sort.reverse;
+                }
+
+                sort.sortingOrder = newSortingOrder;
+            };
+
+
+            scope.selectedCls = function (column) {
+                if (column == scope.sort.sortingOrder) {
+                    return ('fa fa-chevron-' + ((scope.sort.reverse) ? 'down' : 'up'));
+                }
+                else {
+                    return 'fa fa-sort'
+                }
+            };
+        }// end link
+    }
+});
 
 /**
  * Metrics controller

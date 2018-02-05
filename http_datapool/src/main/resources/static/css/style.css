@@ -17,9 +17,13 @@
 header{
     padding: 10px 10px 20px;
 }
+header h3{
+    line-height: 30px;
+    margin-bottom: 0px;
+}
 header img{
     float: left;
-    margin-right: 30px;
+    margin: 5px 30px 5px 0;
 }
 
 h4{
@@ -39,25 +43,25 @@ h4{
 === Suggestions block ===
 */
 
-#add-suggestions-block{
-    position: absolute;
-    width: 430px;
-    margin: 0 10px;
-    padding: 0 14px;
-    z-index: 1;
-}
+/*#add-suggestions-block{*/
+    /*position: absolute;*/
+    /*width: 430px;*/
+    /*margin: 0 10px;*/
+    /*padding: 0 14px;*/
+    /*z-index: 1;*/
+/*}*/
 
-#add-suggestions-block li{
-    list-style-type: none;
-    background-color: #B3E5FC;
-    width: 100%;
-    padding: 5px 10px;
-}
-#add-suggestions-block li:hover {
-    background-color: #0e90d2;
-    cursor: pointer;
-    color: white;
-}
+/*#add-suggestions-block li{*/
+    /*list-style-type: none;*/
+    /*background-color: #B3E5FC;*/
+    /*width: 100%;*/
+    /*padding: 5px 10px;*/
+/*}*/
+/*#add-suggestions-block li:hover {*/
+    /*background-color: #0e90d2;*/
+    /*cursor: pointer;*/
+    /*color: white;*/
+/*}*/
 
 
 .fa-spinner.statusIcon{
@@ -79,6 +83,10 @@ h4{
 
 .btn-transparent{
     background-color: #ecf0f1 !important;
+}
+
+.btn-lightgrey{
+    background-color: lightgrey !important;
 }
 
 .btn-cyan{
