@@ -39,10 +39,7 @@ public class TablesCacheImpl implements TablesCache {
     public Optional<List<Map<String, Object>>> getDataFromCache(String tableName, Set<String> columnNames) {
         log.debug("getDataFromCache() tableName:{}, columnNames:{}", tableName, columnNames);
 
-        Optional<List<Map<String, Object>>> table = cache.entrySet().stream()
-                .filter(entry -> entry.getKey().equals(tableName))
-                .map(Map.Entry::getValue)
-                .findAny();
+        Optional<List<Map<String, Object>>> table = Optional.ofNullable(cache.get(tableName));
 //        log.debug("getTableFromCache: {}", table);
 
         if (!columnNames.contains("*")) {
