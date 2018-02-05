@@ -1,4 +1,4 @@
-package ru.sbt.util.HTTPDatapool;
+package ru.sbt.util.HTTPDatapool.DDosilka;
 
 import ru.sbt.util.HTTPDatapool.httpdto.RequestType;
 import ru.sbt.util.HTTPDatapool.httpparameter.HttpParameter;

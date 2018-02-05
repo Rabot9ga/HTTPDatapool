@@ -39,7 +39,7 @@ public class MainControllerTest extends AbstractTransactionalTestNGSpringContext
     @Autowired
     private DBRepository dbRepository;
 
-    @Test
+    @Test(threadPoolSize = 10, invocationCount = 20)
     public void getParameter() throws IOException, InterruptedException {
 
 

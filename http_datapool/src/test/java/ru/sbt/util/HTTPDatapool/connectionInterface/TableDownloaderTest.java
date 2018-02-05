@@ -82,9 +82,9 @@ public class TableDownloaderTest {
     public void testGetDowloadedRowCount() throws Exception {
         downloader.putInCache();
 
-        int dowloadedRowCount = downloader.getDowloadedRowCount();
+        int dowloadedRowCount = downloader.getDownloadedRowCount();
         Thread.sleep(1);
-        int dowloadedRowCount1 = downloader.getDowloadedRowCount();
+        int dowloadedRowCount1 = downloader.getDownloadedRowCount();
 
         log.debug("dowloadedRowCount: {}", dowloadedRowCount);
         log.debug("dowloadedRowCount1: {}", dowloadedRowCount1);

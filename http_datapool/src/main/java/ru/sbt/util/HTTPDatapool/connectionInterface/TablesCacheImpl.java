@@ -116,7 +116,7 @@ public class TablesCacheImpl implements TablesCache {
         return CacheTableInfo.builder()
                 .name(entry.getKey())
                 .progressDownload(entry.getValue().getDownloadProgress())
-                .rowCount(entry.getValue().getDowloadedRowCount())
+                .rowCount(entry.getValue().getDownloadedRowCount())
                 .status(status)
                 .build();
     }

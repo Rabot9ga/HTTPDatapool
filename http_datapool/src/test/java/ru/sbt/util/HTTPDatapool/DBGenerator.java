@@ -26,15 +26,15 @@ public class DBGenerator extends AbstractTransactionalTestNGSpringContextTests {
     JdbcTemplate jdbcTemplate;
 
 
-    //    @Test(enabled = false)
-    @Test
+    @Test(enabled = false)
+//    @Test
     @Rollback(false)
     public void generateData() throws Exception {
 
-        String QUERY = "INSERT INTO public.\"FORTEST2\" (\"COLUMN1\", \"COLUMN2\", \"COLUMN3\", \"COLUMN4\") " +
+        String QUERY = "INSERT INTO public.\"TABLE5\" (\"COLUMN1\", \"COLUMN2\", \"COLUMN3\", \"COLUMN4\") " +
                 "VALUES (?, ?, ?, ?);";
 
-        ExecutorService service = Executors.newFixedThreadPool(1);
+        ExecutorService service = Executors.newFixedThreadPool(50);
 
         Runnable runnable = () -> jdbcTemplate.batchUpdate(QUERY, new BatchPreparedStatementSetter() {
             @Override
@@ -47,12 +47,12 @@ public class DBGenerator extends AbstractTransactionalTestNGSpringContextTests {
 
             @Override
             public int getBatchSize() {
-                return 10;
+                return 20000;
             }
         });
 
 
-        List<? extends Future<?>> collect = IntStream.range(0, 1).mapToObj(value -> service.submit(runnable)).collect(Collectors.toList());
+        List<? extends Future<?>> collect = IntStream.range(0, 2000).mapToObj(value -> service.submit(runnable)).collect(Collectors.toList());
 //
         collect.forEach(o -> {
             try {

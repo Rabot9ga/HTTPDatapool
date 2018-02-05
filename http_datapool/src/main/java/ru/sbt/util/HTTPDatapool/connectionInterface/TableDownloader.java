@@ -15,17 +15,17 @@ public class TableDownloader {
     private AtomicInteger passCountFuture = new AtomicInteger();
     private AtomicInteger failCountFuture = new AtomicInteger();
 
-    private ConcurrentHashMap<String, List<Map<String, Object>>> cache;
-    private ExecutorService service;
-    private DBRepository dbRepository;
+    private final ConcurrentHashMap<String, List<Map<String, Object>>> cache;
+    private final ExecutorService service;
+    private final DBRepository dbRepository;
     @Getter
-    private String tableName;
+    private final String tableName;
     @Getter
-    private int countRows;
+    private final int countRowsOneSelect;
     @Getter
-    private int countRowsOneSelect;
+    private volatile int countRows;
     @Getter
-    private int taskCount;
+    private volatile int taskCount;
     @Getter
     private Map<String, Object>[] tmpLines;
     @Getter
@@ -79,9 +79,13 @@ public class TableDownloader {
         return -1.0;
     }
 
-    public int getDowloadedRowCount() {
+    public int getDownloadedRowCount() {
         int passCount = passCountFuture.get();
-        return passCount * countRowsOneSelect;
+        int downloadedCount = passCount * countRowsOneSelect;
+
+        if (downloadedCount > countRows) return countRows;
+
+        return downloadedCount;
     }
 
     private void putValue(List<Map<String, Object>> list, int from, String tableName) {
@@ -99,6 +103,7 @@ public class TableDownloader {
         }
 
         if (passCount + failCount == taskCount) {
+            log.info("Table: {} downloaded", tableName);
             List<Map<String, Object>> listMap;
             if (failCount > 0) {
                 listMap = Arrays.stream(tmpLines)
