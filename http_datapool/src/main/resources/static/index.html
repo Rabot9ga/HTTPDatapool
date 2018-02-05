@@ -27,7 +27,7 @@
 <header class="wrapper">
     <img src="MDB/img/dblogo.png" style="height: 60px;"/>
     <h3>HTTPDataPool</h3>
-    <span class="small">v0.5</span>
+    <span class="small">v0.0.1_5</span>
 </header>
 <!-- Nav tabs -->
 <div class="tabs-wrapper tabs-cyan">
@@ -58,14 +58,6 @@
                     <div class="col-sm-5 search-line" >
                         <input id="tableToAddInput" type="text" ng-mousedown="updateTablesInDBSuggestionsList()" class="input-large search-query" ng-model="tableToAdd" ng-model-options="{updateOn: 'keyup'}" name="tableToAdd" placeholder="Имя таблицы"
                                ng-keypress="checkIfEnterWasPressed($event)" >
-                               <!--ng-keydown="$event.keyCode === 13 && addTableCache(tableToAdd)"/>-->
-                               <!--&lt;!&ndash;ng-keydown="$event.keyCode === 13 && addTableCache(tableToAdd)"/>&ndash;&gt;-->
-
-
-                        <!--<div id="add-suggestions-block">-->
-                            <!--<li class="suggestion-row" ng-click="fillTableAddInput(table)" ng-repeat="table in (tablesInDB)" ng-bind="table"></li>-->
-                            <!--&lt;!&ndash;<li class="suggestion-row" ng-click="fillTableAddInput(table)" ng-repeat="table in (tablesInDB | filter:showTablesInDBSuggestions)" ng-bind="table"></li>&ndash;&gt;-->
-                        <!--</div>-->
                     </div>
                     <div class="col-md-2 search-line">
                         <a href ng-click="addTableCache(tableToAdd)" class="btn btn-info waves-effect waves-light"
@@ -94,9 +86,9 @@
             <table class="table table-striped table-condensed table-hover">
                 <thead>
                 <tr>
-                    <th class="name" custom-sort order="'name'" sort="sort">Имя таблицы</th>
-                    <th class="rowCount" custom-sort order="'rowCount'" sort="sort">Кол-во строк</th>
-                    <th class="tableStatus" colspan="2">Статус</th>
+                    <th class="name" custom-sort order="'name'" sort="sort">Имя таблицы&nbsp;</th>
+                    <th class="rowCount" custom-sort order="'rowCount'" sort="sort">Кол-во строк&nbsp;</th>
+                    <th class="tableStatus" colspan="2">Статус&nbsp;</th>
                     <th class="clearTable">Очистить таблицу</th>
                 </tr>
                 </thead>
@@ -128,13 +120,13 @@
                 <tbody>
                 <tr ng-repeat="item in pagedItems[currentPage] | orderBy:sort.sortingOrder:sort.reverse">
                     <td>{{item.name}}</td>
-                    <td>{{item.rowCount}}</td>
+                    <td>{{item.rowCount | number: fractionSize}}</td>
                     <td>{{item.status}}</td>
                     <td>
                         {{item.progressDownload * 100 | number:2}}%
                         <i ng-if="item.status == 'READY'" class="fa fa-check fa-lg statusIcon" area-hidden="true"></i>
-                        <i ng-if="item.status == 'UPDATING'" class="fa fa-spinner fa-spin fa-lg statusIcon"
-                           area-hidden="true"></i>
+                        <i ng-if="item.status == 'UPDATING'" class="fa fa-spinner fa-spin fa-lg statusIcon" area-hidden="true"></i>
+                        <i ng-if="item.status == 'NEW'" class="fa fa-clock-o fa-lg statusIcon" area-hidden="true"></i>
                     </td>
                     <td class="clearTable">
                         <button href ng-click="confirmClearTableCache(item.name)"
