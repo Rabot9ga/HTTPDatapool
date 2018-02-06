@@ -85,7 +85,7 @@ public class TableDownloaderTest {
         downloader.putInCache();
 
         int dowloadedRowCount = downloader.getDownloadedRowCount();
-        Thread.sleep(1);
+        Thread.sleep(5);
         int dowloadedRowCount1 = downloader.getDownloadedRowCount();
 
         log.debug("dowloadedRowCount: {}", dowloadedRowCount);
