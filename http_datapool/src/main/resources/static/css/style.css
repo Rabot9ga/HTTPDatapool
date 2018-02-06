@@ -77,7 +77,11 @@ h4{
 .btn:hover{
     background-position:inherit;
 }
-.btn-danger:hover i{
+.btn-danger i, .btn-info i{
+    margin: 0 5px;
+}
+
+.btn-danger:hover i, .btn-info:hover i, .btn-warning:hover i{
     transform: scale(1.2,1.2);
 }
 
@@ -107,7 +111,7 @@ h4{
 === Tabs ===
 */
 .tabs-cyan {
-    background-color: #33b5e5;;
+    background-color: #33b5e5;
 }
 .tabs-grey {
     background-color: #546e7a;
@@ -116,6 +120,17 @@ h4{
     border-bottom: 3px solid #F00;
     color: #fff;
 }
+.classic-tabs li a:hover {
+    border-bottom: 3px solid #fff;
+    color: #fff;
+    background-color: #43c5f5;
+}
+.tabs-grey .classic-tabs li a:hover {
+    border-bottom: 3px solid #fff;
+    color: #fff;
+    background-color: #647e8a;
+}
+
 .classic-tabs.tabs-cyan li a.active {
     border-color: #ffeb3b;
 }

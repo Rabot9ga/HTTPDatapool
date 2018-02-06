@@ -57,6 +57,24 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
         if (name === '') return;
         $scope.tableToAdd = "";
 
+
+        $.confirm({
+            icon: 'fa fa-spinner fa-spin',
+            title: 'Мы работаем над этим..',
+            content: "Запрос на добавление таблицы в кэш отправлен",
+            autoClose: 'gotIt|3000',
+            buttons: {
+                gotIt: {
+                    text: 'Я понял',
+                    keys: ['enter'],
+                    btnClass: 'btn-lightgrey',
+                    action: function () {
+                        $scope.getTables();
+                    }
+                }
+            }
+        });
+
         $http.post("/api/frontEnd/addTable", name)
             .then(function (response) {
                     $scope.items = response.data;
@@ -68,25 +86,13 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
                     //     var isUpdateDone = updateAddingStatus(name);
                     //     if (isUpdateDone) $interval.cancel(stop);
                     // }, 1000);
-                    $.confirm({
-                        icon: 'fa fa-spinner fa-spin',
-                        title: 'Мы работаем над этим..',
-                        content: "Запрос на добавление таблицы в кэш отправлен, но её появление в интерфейсе может произойти не сразу",
-                        buttons: {
-                            gotIt: {
-                                text: 'Я понял',
-                                keys: ['enter'],
-                                action: function () {
-                                    $scope.getTables();
-                                }
-                            }
-                        }
-                    });
+
                 },
                 function () {
                     $.confirm({
-                        title: "Ошибка!",
-                        content: "Таблица уже существует!",
+                        icon: 'fa fa-exclamation-triangle fa-spin',
+                        title: "Алярм!",
+                        content: "Таблица не существует или что-то пошло не так!",
                         type: 'red',
                         typeAnimated: true,
                         buttons: {
@@ -110,6 +116,8 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
             type: 'red',
             typeAnimated: true,
             escapeKey: true,
+            icon: 'fa fa-exclamation-triangle',
+            autoClose: 'close|5000',
             buttons: {
                 tryDelete: {
                     text: 'Удаляем!',
@@ -118,7 +126,7 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
                         $scope.clickClearTableCache(name);
                     }
                 },
-                close: {
+                close:{
                     text: 'Не уверен',
                     btnClass: 'btn-default btn-cyan',
                     action: function () {
@@ -140,10 +148,12 @@ app.controller('getCacheContent', function ($scope, $filter, $http, $interval) {
             type: 'red',
             typeAnimated: true,
             escapeKey: true,
+            icon: 'fa fa-exclamation-triangle',
+            autoClose: 'close|5000',
             buttons: {
                 tryDelete: {
                     text: 'Обновляем!',
-                    btnClass: 'btn-red btn-transparent',
+                    btnClass: 'btn-red btn-lightgrey',
                     action: function () {
                         $scope.clickUpdateTableCache(name);
                     }
