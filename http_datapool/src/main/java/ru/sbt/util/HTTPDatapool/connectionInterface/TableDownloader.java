@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,7 @@ public class TableDownloader {
     private Map<String, Object>[] tmpLines;
     @Getter
     private ArrayList<CompletableFuture<Void>> futures;
-    private volatile boolean abortedDownload;
+    private AtomicBoolean isDownloadCanceled = new AtomicBoolean(false);
 
     @Getter
     private volatile boolean isReady = false;
@@ -58,7 +59,7 @@ public class TableDownloader {
             int from = i * countRowsOneSelect + 1;
             int to = (i + 1) * countRowsOneSelect;
 
-            CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> dbRepository.getFromTableBetween(tableName, from, to), service)
+            CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> getDataFromDB(from, to), service)
                     .exceptionally(throwable -> exceptionally(tableName, from, to, throwable))
                     .thenAccept(list -> putValue(list, from, tableName));
 
@@ -66,15 +67,25 @@ public class TableDownloader {
         }
     }
 
+    private List<Map<String, Object>> getDataFromDB(int from, int to) {
+        log.debug("isDownloadCanceled: {}", isDownloadCanceled.get());
+        if (!isDownloadCanceled.get()) {
+            log.debug("getDataFromDB(int {}, int {})", from, to);
+            return dbRepository.getFromTableBetween(tableName, from, to);
+        }
+        return new ArrayList<>();
+    }
+
     public void deleteFromCache() {
+        log.debug("delete from cache table: {}", tableName);
         futures.stream()
                 .filter(future -> !future.isDone())
                 .forEach(future -> future.cancel(false));
-        abortedDownload = true;
+        isDownloadCanceled.set(true);
     }
 
     public double getDownloadProgress() {
-        if (!abortedDownload) {
+        if (!isDownloadCanceled.get()) {
             int passCount = passCountFuture.get();
             int failCount = failCountFuture.get();
             return (double) (passCount + failCount) / (double) taskCount;
