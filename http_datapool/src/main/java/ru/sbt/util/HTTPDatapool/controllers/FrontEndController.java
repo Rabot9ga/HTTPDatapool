@@ -89,12 +89,17 @@ public class FrontEndController {
             2) Adding table to cache
             3) Requesting its rowCount
          */
+        List<String> allTableNamesInDB = dbRepository.getAllTableNamesInDB();
+        if (allTableNamesInDB.contains(tableName)) {
+            tablesCache.getDataFromCache(tableName, Collections.singleton("*"));
 
-        tablesCache.getDataFromCache(tableName, Collections.singleton("*"));
+            list = tablesCache.getAllInfoAboutTablesInCache();
 
-        list = tablesCache.getAllInfoAboutTablesInCache();
+            return ResponseEntity.ok(list);
+        }
 
-        return ResponseEntity.ok(list);
+        return ResponseEntity.badRequest().body(null);
+
     }
 
     /**
