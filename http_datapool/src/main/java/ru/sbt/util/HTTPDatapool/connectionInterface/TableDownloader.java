@@ -68,7 +68,6 @@ public class TableDownloader {
     }
 
     private List<Map<String, Object>> getDataFromDB(int from, int to) {
-        log.debug("isDownloadCanceled: {}", isDownloadCanceled.get());
         if (!isDownloadCanceled.get()) {
             log.debug("getDataFromDB(int {}, int {})", from, to);
             return dbRepository.getFromTableBetween(tableName, from, to);
@@ -88,7 +87,11 @@ public class TableDownloader {
         if (!isDownloadCanceled.get()) {
             int passCount = passCountFuture.get();
             int failCount = failCountFuture.get();
-            return (double) (passCount + failCount) / (double) taskCount;
+
+            if (passCount + failCount == 0)
+                return 0;
+            else
+                return (double) (passCount + failCount) / (double) taskCount;
         }
         return -1.0;
     }
