@@ -1,5 +1,4 @@
-
-plugins{
+plugins {
     id 'java'
     id 'idea'
     id 'maven-publish'
@@ -37,7 +36,18 @@ subprojects {
         testCompile('org.testng:testng:6.9.9')
     }
 
+    test {
+        useTestNG() {
+//            includeGroups 'unit'
+//            excludeGroups 'integration'
+        }
+        include 'ru/sbt/util/HTTPDatapool/datapool/**'
+        include 'ru/sbt/util/HTTPDatapool/paramsContainer/**'
+        include 'ru/sbt/util/HTTPDatapool/connectionInterface/TableDownloaderTest**'
 
+        maxHeapSize = "512m"
+
+    }
 
     publishing {
         publications {
