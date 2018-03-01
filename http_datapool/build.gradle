@@ -1,31 +1,10 @@
 version = '0.0.1-SNAPSHOT'
 
-repositories {
-    maven {
-        url 'http://pprb-oip-tn-4.ca.sbrf.ru:8081/artifactory/atrifactory-gradle-repo'
-        credentials {
-            username = "${artifactory_user}"
-            password = "${artifactory_password}"
-        }
-    }
-
-    maven {
-        url "http://sbtnexus.ca.sbrf.ru:8081/nexus/content/repositories/central/"
-    }
-    maven {
-        url "http://sbtnexus.ca.sbrf.ru:8081/nexus/content/repositories/AC_COM_thirdparty/"
-    }
-    maven {
-        url "http://sbtnexus.ca.sbrf.ru:8081/nexus/content/repositories/jcenter/"
-    }
-}
-
-artifactoryPublish {
-    dependsOn bootRepackage
-}
+apply plugin: 'org.springframework.boot'
 
 springBoot {
     executable = true
+
     embeddedLaunchScriptProperties =
             [mode     : 'service',
              pidFolder: 'pid/',
@@ -34,8 +13,11 @@ springBoot {
 
 }
 
+artifactoryPublish {
+    dependsOn bootRepackage
+}
+
 dependencies {
-    compile('org.springframework.boot:spring-boot-starter-actuator')
     compile('org.springframework.boot:spring-boot-starter-jdbc')
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.apache.commons:commons-lang3:3.6')
@@ -45,7 +27,7 @@ dependencies {
 //    runtime('com.oracle.jdbc:ojdbc7:12.1.0.2')
     runtime('org.postgresql:postgresql')
 
-    compile project(':http_parameter')
+    testCompile project(':http_parameter')
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('com.squareup.retrofit2:retrofit:2.3.0')
     testCompile('com.squareup.retrofit2:converter-jackson:2.3.0')

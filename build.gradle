@@ -1,30 +1,11 @@
-buildscript {
-    ext {
-        springBootVersion = '1.5.9.RELEASE'
-    }
-    repositories {
-        maven {
-            url 'http://pprb-oip-tn-4.ca.sbrf.ru:8081/artifactory/atrifactory-gradle-repo'
-            credentials {
-                username = "${artifactory_user}"
-                password = "${artifactory_password}"
-            }
-        }
-        maven {
-            url "http://sbtnexus.ca.sbrf.ru:8081/nexus/content/repositories/jcenter/"
-        }
-        maven {
-            url "http://sbtnexus.ca.sbrf.ru:8081/nexus/content/repositories/central/"
-        }
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
 
-        //Check for the latest version here: http://plugins.gradle.org/plugin/com.jfrog.artifactory
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.6.2"
-    }
+plugins{
+    id 'java'
+    id 'idea'
+    id 'maven-publish'
+    id "com.jfrog.artifactory" version "4.6.2"
+    id 'org.springframework.boot' version '1.5.9.RELEASE' apply false
 }
-
 
 subprojects {
 
@@ -33,7 +14,6 @@ subprojects {
     apply plugin: 'idea'
     apply plugin: "com.jfrog.artifactory"
     apply plugin: 'maven-publish'
-    apply plugin: 'org.springframework.boot'
 
 
     sourceCompatibility = 1.8
@@ -42,9 +22,12 @@ subprojects {
 
 
     repositories {
-        maven {
-            url 'http://pprb-oip-tn-4.ca.sbrf.ru:8081/artifactory/atrifactory-gradle-repo'
-        }
+//        maven {
+//            url 'http://pprb-oip-tn-4.ca.sbrf.ru:8081/artifactory/atrifactory-gradle-repo'
+//        }
+        jcenter()
+        mavenCentral()
+
     }
 
     dependencies {
